@@ -32,15 +32,15 @@ namespace LogicLib
 
 		void Clear();
 		
-		short GetIndex() { return m_Index;  }
+		short GetIndex() { return _index;  }
 
-		bool IsUsed() { return m_IsUsed; }
+		bool IsUsed() { return _isUsed; }
 
-		const wchar_t* GetTitle() { return m_Title.c_str(); }
+		const wchar_t* GetTitle() { return _title.c_str(); }
 
-		short MaxUserCount() { return m_MaxUserCount; }
+		short MaxUserCount() { return _maxUserCount; }
 
-		short GetUserCount() { return (short)m_UserList.size(); }
+		short GetUserCount() { return (short)_userList.size(); }
 
 		ERROR_CODE CreateRoom(const wchar_t* pRoomTitle);
 
@@ -63,16 +63,17 @@ namespace LogicLib
 		void NotifyChat(const int sessionIndex, const char* pszUserID, const wchar_t* pszMsg);
 
 	private:
-		ILog* m_pRefLogger;
-		TcpNet* m_pRefNetwork;
 
-		short m_Index = -1;
-		short m_MaxUserCount;
+		ILog* _refLogger;
+		TcpNet* _refNetwork;
+
+		short _index = -1;
+		short _maxUserCount;
 		
-		bool m_IsUsed = false;
-		std::wstring m_Title;
-		std::vector<User*> m_UserList;
+		bool _isUsed = false;
+		std::wstring _title;
+		std::vector<User*> _userList;
 
-		Game* m_pGame = nullptr;
+		Game* _game = nullptr;
 	};
 }

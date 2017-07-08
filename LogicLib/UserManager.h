@@ -28,18 +28,19 @@ namespace LogicLib
 
 				
 	private:
-		User* AllocUserObjPoolIndex();
-		void ReleaseUserObjPoolIndex(const int index);
+		User* allocUserObjPoolIndex();
+		void releaseUserObjPoolIndex(const int index);
 
-		User* FindUser(const int sessionIndex);
-		User* FindUser(const char* pszID);
+		User* findUser(const int sessionIndex);
+		User* findUser(const char* pszID);
 				
 	private:
-		std::vector<User> m_UserObjPool;
-		std::deque<int> m_UserObjPoolIndex;
 
-		std::unordered_map<int, User*> m_UserSessionDic;
-		std::unordered_map<const char*, User*> m_UserIDDic; //char*는 key로 사용못함
+		std::vector<User> _userObjPool;
+		std::deque<int> _userObjPoolIndex;
+
+		std::unordered_map<int, User*> _userSessionDic;
+		std::unordered_map<const char*, User*> _userIDDic; //char*는 key로 사용못함
 
 	};
 }

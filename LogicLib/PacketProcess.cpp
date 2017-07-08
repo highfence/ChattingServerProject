@@ -21,13 +21,13 @@ namespace LogicLib
 
 	void PacketProcess::Init(TcpNet* pNetwork, UserManager* pUserMgr, LobbyManager* pLobbyMgr, ServerConfig* pConfig, ILog* pLogger)
 	{
-		m_pRefLogger = pLogger;
-		m_pRefNetwork = pNetwork;
-		m_pRefUserMgr = pUserMgr;
-		m_pRefLobbyMgr = pLobbyMgr;
+		_refLogger = pLogger;
+		_refNetwork = pNetwork;
+		_refUserMgr = pUserMgr;
+		_refLobbyMgr = pLobbyMgr;
 
-		m_pConnectedUserManager = std::make_unique<ConnectedUserManager>();
-		m_pConnectedUserManager->Init(pNetwork->ClientSessionPoolSize(), pNetwork, pConfig, pLogger);
+		_connectedUserManager = std::make_unique<ConnectedUserManager>();
+		_connectedUserManager->Init(pNetwork->ClientSessionPoolSize(), pNetwork, pConfig, pLogger);
 
 		using netLibPacketId = NetworkLib::PACKET_ID;
 		using commonPacketId = NCommon::PACKET_ID;
@@ -36,24 +36,24 @@ namespace LogicLib
 			PacketFuncArray[i] = nullptr;
 		}
 
-		PacketFuncArray[(int)netLibPacketId::NTF_SYS_CONNECT_SESSION] = &PacketProcess::NtfSysConnctSession;
-		PacketFuncArray[(int)netLibPacketId::NTF_SYS_CLOSE_SESSION] = &PacketProcess::NtfSysCloseSession;
-		PacketFuncArray[(int)commonPacketId::LOGIN_IN_REQ] = &PacketProcess::Login;
-		PacketFuncArray[(int)commonPacketId::LOBBY_LIST_REQ] = &PacketProcess::LobbyList;
-		PacketFuncArray[(int)commonPacketId::LOBBY_ENTER_REQ] = &PacketProcess::LobbyEnter;
-		PacketFuncArray[(int)commonPacketId::LOBBY_ENTER_ROOM_LIST_REQ] = &PacketProcess::LobbyRoomList;
-		PacketFuncArray[(int)commonPacketId::LOBBY_ENTER_USER_LIST_REQ] = &PacketProcess::LobbyUserList;
-		PacketFuncArray[(int)commonPacketId::LOBBY_CHAT_REQ] = &PacketProcess::LobbyChat;
-		PacketFuncArray[(int)commonPacketId::LOBBY_LEAVE_REQ] = &PacketProcess::LobbyLeave;
-		PacketFuncArray[(int)commonPacketId::ROOM_ENTER_REQ] = &PacketProcess::RoomEnter;
-		PacketFuncArray[(int)commonPacketId::ROOM_LEAVE_REQ] = &PacketProcess::RoomLeave;
-		PacketFuncArray[(int)commonPacketId::ROOM_CHAT_REQ] = &PacketProcess::RoomChat;
-		PacketFuncArray[(int)commonPacketId::ROOM_MASTER_GAME_START_REQ] = &PacketProcess::RoomMasterGameStart;
-		PacketFuncArray[(int)commonPacketId::ROOM_GAME_START_REQ] = &PacketProcess::RoomGameStart;
+		PacketFuncArray[(int)netLibPacketId::NTF_SYS_CONNECT_SESSION] = &PacketProcess::ntfSysConnctSession;
+		PacketFuncArray[(int)netLibPacketId::NTF_SYS_CLOSE_SESSION] = &PacketProcess::ntfSysCloseSession;
+		PacketFuncArray[(int)commonPacketId::LOGIN_IN_REQ] = &PacketProcess::login;
+		PacketFuncArray[(int)commonPacketId::LOBBY_LIST_REQ] = &PacketProcess::lobbyList;
+		PacketFuncArray[(int)commonPacketId::LOBBY_ENTER_REQ] = &PacketProcess::lobbyEnter;
+		PacketFuncArray[(int)commonPacketId::LOBBY_ENTER_ROOM_LIST_REQ] = &PacketProcess::lobbyRoomList;
+		PacketFuncArray[(int)commonPacketId::LOBBY_ENTER_USER_LIST_REQ] = &PacketProcess::lobbyUserList;
+		PacketFuncArray[(int)commonPacketId::LOBBY_CHAT_REQ] = &PacketProcess::lobbyChat;
+		PacketFuncArray[(int)commonPacketId::LOBBY_LEAVE_REQ] = &PacketProcess::lobbyLeave;
+		PacketFuncArray[(int)commonPacketId::ROOM_ENTER_REQ] = &PacketProcess::roomEnter;
+		PacketFuncArray[(int)commonPacketId::ROOM_LEAVE_REQ] = &PacketProcess::roomLeave;
+		PacketFuncArray[(int)commonPacketId::ROOM_CHAT_REQ] = &PacketProcess::roomChat;
+		PacketFuncArray[(int)commonPacketId::ROOM_MASTER_GAME_START_REQ] = &PacketProcess::roomMasterGameStart;
+		PacketFuncArray[(int)commonPacketId::ROOM_GAME_START_REQ] = &PacketProcess::roomGameStart;
 
 
 
-		PacketFuncArray[(int)commonPacketId::DEV_ECHO_REQ] = &PacketProcess::DevEcho;
+		PacketFuncArray[(int)commonPacketId::DEV_ECHO_REQ] = &PacketProcess::devEcho;
 	}
 	
 	void PacketProcess::Process(PacketInfo packetInfo)
@@ -71,22 +71,22 @@ namespace LogicLib
 
 	void PacketProcess::StateCheck()
 	{
-		m_pConnectedUserManager->LoginCheck();
+		_connectedUserManager->LoginCheck();
 	}
 
-	ERROR_CODE PacketProcess::NtfSysConnctSession(PacketInfo packetInfo)
+	ERROR_CODE PacketProcess::ntfSysConnctSession(PacketInfo packetInfo)
 	{
-		m_pConnectedUserManager->SetConnectSession(packetInfo.SessionIndex);
+		_connectedUserManager->SetConnectSession(packetInfo.SessionIndex);
 		return ERROR_CODE::NONE;
 	}
 
-	ERROR_CODE PacketProcess::NtfSysCloseSession(PacketInfo packetInfo)
+	ERROR_CODE PacketProcess::ntfSysCloseSession(PacketInfo packetInfo)
 	{
-		auto pUser = std::get<1>(m_pRefUserMgr->GetUser(packetInfo.SessionIndex));
+		auto pUser = std::get<1>(_refUserMgr->GetUser(packetInfo.SessionIndex));
 
 		if (pUser) 
 		{
-			auto pLobby = m_pRefLobbyMgr->GetLobby(pUser->GetLobbyIndex());
+			auto pLobby = _refLobbyMgr->GetLobby(pUser->GetLobbyIndex());
 			if (pLobby)
 			{
 				auto pRoom = pLobby->GetRoom(pUser->GetRoomIndex());
@@ -97,7 +97,7 @@ namespace LogicLib
 					pRoom->NotifyLeaveUserInfo(pUser->GetID().c_str());
 					pLobby->NotifyChangedRoomInfo(pRoom->GetIndex());
 
-					m_pRefLogger->Write(LOG_TYPE::L_INFO, "%s | NtfSysCloseSesson. sessionIndex(%d). Room Out", __FUNCTION__, packetInfo.SessionIndex);
+					_refLogger->Write(LOG_TYPE::L_INFO, "%s | NtfSysCloseSesson. sessionIndex(%d). Room Out", __FUNCTION__, packetInfo.SessionIndex);
 				}
 
 				pLobby->LeaveUser(pUser->GetIndex());
@@ -106,20 +106,20 @@ namespace LogicLib
 					pLobby->NotifyLobbyLeaveUserInfo(pUser);
 				}
 
-				m_pRefLogger->Write(LOG_TYPE::L_INFO, "%s | NtfSysCloseSesson. sessionIndex(%d). Lobby Out", __FUNCTION__, packetInfo.SessionIndex);
+				_refLogger->Write(LOG_TYPE::L_INFO, "%s | NtfSysCloseSesson. sessionIndex(%d). Lobby Out", __FUNCTION__, packetInfo.SessionIndex);
 			}
 			
-			m_pRefUserMgr->RemoveUser(packetInfo.SessionIndex);		
+			_refUserMgr->RemoveUser(packetInfo.SessionIndex);		
 		}
 		
-		m_pConnectedUserManager->SetDisConnectSession(packetInfo.SessionIndex);
+		_connectedUserManager->SetDisConnectSession(packetInfo.SessionIndex);
 
-		m_pRefLogger->Write(LOG_TYPE::L_INFO, "%s | NtfSysCloseSesson. sessionIndex(%d)", __FUNCTION__, packetInfo.SessionIndex);
+		_refLogger->Write(LOG_TYPE::L_INFO, "%s | NtfSysCloseSesson. sessionIndex(%d)", __FUNCTION__, packetInfo.SessionIndex);
 		return ERROR_CODE::NONE;
 	}
 	
 
-	ERROR_CODE PacketProcess::DevEcho(PacketInfo packetInfo)
+	ERROR_CODE PacketProcess::devEcho(PacketInfo packetInfo)
 	{		
 		auto reqPkt = (NCommon::PktDevEchoReq*)packetInfo.pRefData;
 		
@@ -129,7 +129,7 @@ namespace LogicLib
 		CopyMemory(resPkt.Datas, reqPkt->Datas, reqPkt->DataSize);
 		
 		auto sendSize = sizeof(NCommon::PktDevEchoRes) - (NCommon::DEV_ECHO_DATA_MAX_SIZE - reqPkt->DataSize);
-		m_pRefNetwork->SendData(packetInfo.SessionIndex, (short)NCommon::PACKET_ID::DEV_ECHO_RES, (short)sendSize, (char*)&resPkt);
+		_refNetwork->SendData(packetInfo.SessionIndex, (short)NCommon::PACKET_ID::DEV_ECHO_RES, (short)sendSize, (char*)&resPkt);
 
 		return ERROR_CODE::NONE;
 	}

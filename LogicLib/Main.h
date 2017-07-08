@@ -22,6 +22,7 @@ namespace LogicLib
 	class Main
 	{
 	public:
+
 		Main();
 		~Main();
 
@@ -31,23 +32,23 @@ namespace LogicLib
 
 		void Stop();
 
+	private:
+
+		ERROR_CODE loadConfig();
+
+		void release();
 
 	private:
-		ERROR_CODE LoadConfig();
 
-		void Release();
+		bool _isRun = false;
 
+		std::unique_ptr<NetworkLib::ServerConfig> _serverConfig;
+		std::unique_ptr<NetworkLib::ILog> _logger;
 
-	private:
-		bool m_IsRun = false;
-
-		std::unique_ptr<NetworkLib::ServerConfig> m_pServerConfig;
-		std::unique_ptr<NetworkLib::ILog> m_pLogger;
-
-		std::unique_ptr<NetworkLib::ITcpNetwork> m_pNetwork;
-		std::unique_ptr<PacketProcess> m_pPacketProc;
-		std::unique_ptr<UserManager> m_pUserMgr;
-		std::unique_ptr<LobbyManager> m_pLobbyMgr;
+		std::unique_ptr<NetworkLib::ITcpNetwork> _network;
+		std::unique_ptr<PacketProcess> _packetProc;
+		std::unique_ptr<UserManager> _userMgr;
+		std::unique_ptr<LobbyManager> _lobbyMgr;
 		
 	};
 }

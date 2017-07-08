@@ -34,52 +34,54 @@ namespace NetworkLib
 
 		void Release() override;
 
-		int ClientSessionPoolSize() override { return (int)m_ClientSessionPool.size(); }
+		int ClientSessionPoolSize() override { return (int)_clientSessionPool.size(); }
 
 		void ForcingClose(const int sessionIndex);
 
 
 	protected:
-		NET_ERROR_CODE InitServerSocket();
-		NET_ERROR_CODE BindListen(short port, int backlogCount);
-		
-		int AllocClientSessionIndex();
-		void ReleaseSessionIndex(const int index);
 
-		int CreateSessionPool(const int maxClientCount);
-		NET_ERROR_CODE NewSession();
-		void SetSockOption(const SOCKET fd);
-		void ConnectedSession(const int sessionIndex, const SOCKET fd, const char* pIP);
+		NET_ERROR_CODE initServerSocket();
+		NET_ERROR_CODE bindListen(short port, int backlogCount);
 		
-		void CloseSession(const SOCKET_CLOSE_CASE closeCase, const SOCKET sockFD, const int sessionIndex);
-		
-		NET_ERROR_CODE RecvSocket(const int sessionIndex);
-		NET_ERROR_CODE RecvBufferProcess(const int sessionIndex);
-		void AddPacketQueue(const int sessionIndex, const short pktId, const short bodySize, char* pDataPos);
-		
-		void RunProcessWrite(const int sessionIndex, const SOCKET fd, fd_set& write_set);
-		NetError FlushSendBuff(const int sessionIndex);
-		NetError SendSocket(const SOCKET fd, const char* pMsg, const int size);
+		int allocClientSessionIndex();
+		void releaseSessionIndex(const int index);
 
-		bool RunCheckSelectResult(const int result);
-		void RunCheckSelectClients(fd_set& read_set, fd_set& write_set);
-		bool RunProcessReceive(const int sessionIndex, const SOCKET fd, fd_set& read_set);
+		int createSessionPool(const int maxClientCount);
+		NET_ERROR_CODE newSession();
+		void setSockOption(const SOCKET fd);
+		void connectedSession(const int sessionIndex, const SOCKET fd, const char* pIP);
+		
+		void closeSession(const SOCKET_CLOSE_CASE closeCase, const SOCKET sockFD, const int sessionIndex);
+		
+		NET_ERROR_CODE recvSocket(const int sessionIndex);
+		NET_ERROR_CODE recvBufferProcess(const int sessionIndex);
+		void addPacketQueue(const int sessionIndex, const short pktId, const short bodySize, char* pDataPos);
+		
+		void runProcessWrite(const int sessionIndex, const SOCKET fd, fd_set& write_set);
+		NetError flushSendBuff(const int sessionIndex);
+		NetError sendSocket(const SOCKET fd, const char* pMsg, const int size);
+
+		bool runCheckSelectResult(const int result);
+		void runCheckSelectClients(fd_set& read_set, fd_set& write_set);
+		bool runProcessReceive(const int sessionIndex, const SOCKET fd, fd_set& read_set);
 		
 	protected:
-		ServerConfig m_Config;
+
+		ServerConfig _config;
 				
-		SOCKET m_ServerSockfd;
+		SOCKET _serverSockfd;
 
-		fd_set m_Readfds;
-		size_t m_ConnectedSessionCount = 0;
+		fd_set _readfds;
+		size_t _connectedSessionCount = 0;
 		
-		int64_t m_ConnectSeq = 0;
+		int64_t _connectSeq = 0;
 		
-		std::vector<ClientSession> m_ClientSessionPool;
-		std::deque<int> m_ClientSessionPoolIndex;
+		std::vector<ClientSession> _clientSessionPool;
+		std::deque<int> _clientSessionPoolIndex;
 		
-		std::deque<RecvPacketInfo> m_PacketQueue;
+		std::deque<RecvPacketInfo> _packetQueue;
 
-		ILog* m_pRefLogger;
+		ILog* _refLogger;
 	};
 }

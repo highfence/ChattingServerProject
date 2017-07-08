@@ -21,50 +21,50 @@ namespace LogicLib
 			User user;
 			user.Init((short)i);
 
-			m_UserObjPool.push_back(user);
-			m_UserObjPoolIndex.push_back(i);
+			_userObjPool.push_back(user);
+			_userObjPoolIndex.push_back(i);
 		}
 	}
 
-	User* UserManager::AllocUserObjPoolIndex()
+	User* UserManager::allocUserObjPoolIndex()
 	{
-		if (m_UserObjPoolIndex.empty()) {
+		if (_userObjPoolIndex.empty()) {
 			return nullptr;
 		}
 
-		int index = m_UserObjPoolIndex.front();
-		m_UserObjPoolIndex.pop_front();
-		return &m_UserObjPool[index];
+		int index = _userObjPoolIndex.front();
+		_userObjPoolIndex.pop_front();
+		return &_userObjPool[index];
 	}
 
-	void UserManager::ReleaseUserObjPoolIndex(const int index)
+	void UserManager::releaseUserObjPoolIndex(const int index)
 	{
-		m_UserObjPoolIndex.push_back(index);
-		m_UserObjPool[index].Clear();
+		_userObjPoolIndex.push_back(index);
+		_userObjPool[index].Clear();
 	}
 
 	ERROR_CODE UserManager::AddUser(const int sessionIndex, const char* pszID)
 	{
-		if (FindUser(pszID) != nullptr) {
+		if (findUser(pszID) != nullptr) {
 			return ERROR_CODE::USER_MGR_ID_DUPLICATION;
 		}
 
-		auto pUser = AllocUserObjPoolIndex();
+		auto pUser = allocUserObjPoolIndex();
 		if (pUser == nullptr) {
 			return ERROR_CODE::USER_MGR_MAX_USER_COUNT;
 		}
 
 		pUser->Set(sessionIndex, pszID);
 		
-		m_UserSessionDic.insert({ sessionIndex, pUser });
-		m_UserIDDic.insert({ pszID, pUser });
+		_userSessionDic.insert({ sessionIndex, pUser });
+		_userIDDic.insert({ pszID, pUser });
 
 		return ERROR_CODE::NONE;
 	}
 
 	ERROR_CODE UserManager::RemoveUser(const int sessionIndex)
 	{
-		auto pUser = FindUser(sessionIndex);
+		auto pUser = findUser(sessionIndex);
 
 		if (pUser == nullptr) {
 			return ERROR_CODE::USER_MGR_REMOVE_INVALID_SESSION;
@@ -73,16 +73,16 @@ namespace LogicLib
 		auto index = pUser->GetIndex();
 		auto pszID = pUser->GetID();
 
-		m_UserSessionDic.erase(sessionIndex);
-		m_UserIDDic.erase(pszID.c_str());
-		ReleaseUserObjPoolIndex(index);
+		_userSessionDic.erase(sessionIndex);
+		_userIDDic.erase(pszID.c_str());
+		releaseUserObjPoolIndex(index);
 
 		return ERROR_CODE::NONE;
 	}
 
 	std::tuple<ERROR_CODE, User*> UserManager::GetUser(const int sessionIndex)
 	{
-		auto pUser = FindUser(sessionIndex);
+		auto pUser = findUser(sessionIndex);
 
 		if (pUser == nullptr) {
 			return { ERROR_CODE::USER_MGR_INVALID_SESSION_INDEX, nullptr };
@@ -95,11 +95,11 @@ namespace LogicLib
 		return{ ERROR_CODE::NONE, pUser };
 	}
 
-	User* UserManager::FindUser(const int sessionIndex)
+	User* UserManager::findUser(const int sessionIndex)
 	{
-		auto findIter = m_UserSessionDic.find(sessionIndex);
+		auto findIter = _userSessionDic.find(sessionIndex);
 		
-		if (findIter == m_UserSessionDic.end()) {
+		if (findIter == _userSessionDic.end()) {
 			return nullptr;
 		}
 		
@@ -107,11 +107,11 @@ namespace LogicLib
 		return (User*)findIter->second;
 	}
 
-	User* UserManager::FindUser(const char* pszID)
+	User* UserManager::findUser(const char* pszID)
 	{
-		auto findIter = m_UserIDDic.find(pszID);
+		auto findIter = _userIDDic.find(pszID);
 
-		if (findIter == m_UserIDDic.end()) {
+		if (findIter == _userIDDic.end()) {
 			return nullptr;
 		}
 

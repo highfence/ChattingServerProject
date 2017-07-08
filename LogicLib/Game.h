@@ -20,18 +20,19 @@ namespace LogicLib
 
 		void Clear();
 
-		GameState GetState() { return m_State;  }
+		GameState GetState() { return _state;  }
 		
-		void SetState(const GameState state) { m_State = state; }
+		void SetState(const GameState state) { _state = state; }
 
 		bool CheckSelectTime();
 
 	private:
-		GameState m_State = GameState::NONE;
+		
+		GameState _state = GameState::NONE;
 
-		__int64 m_SelectTime;
-		int m_GameSelect1; // 가위(0), 바위(1), 보(2)
-		int m_GameSelect2;
+		__int64 _selectTime;
+		int _gameSelect1; // 가위(0), 바위(1), 보(2)
+		int _gameSelect2;
 	};
 
 }

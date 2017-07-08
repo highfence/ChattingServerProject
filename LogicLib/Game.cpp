@@ -11,7 +11,7 @@ namespace LogicLib
 
 	void Game::Clear()
 	{
-		m_State = GameState::NONE;
+		_state = GameState::NONE;
 	}
 
 	bool Game::CheckSelectTime()
@@ -19,7 +19,7 @@ namespace LogicLib
 		auto curTime = std::chrono::system_clock::now();
 		auto curSecTime = std::chrono::system_clock::to_time_t(curTime);
 
-		auto diff = curSecTime - m_SelectTime;
+		auto diff = curSecTime - _selectTime;
 		if (diff >= 60)
 		{
 			//

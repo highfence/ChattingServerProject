@@ -12,12 +12,12 @@ namespace LogicLib
 	{
 		void Clear()
 		{
-			m_IsLoginSuccess = false;
-			m_ConnectedTime = 0;
+			_isLoginSuccess = false;
+			_connectedTime = 0;
 		}
 
-		bool m_IsLoginSuccess = false;
-		time_t m_ConnectedTime = 0;
+		bool _isLoginSuccess = false;
+		time_t _connectedTime = 0;
 	};
 
 	class ConnectedUserManager
@@ -30,40 +30,40 @@ namespace LogicLib
 
 		void Init(const int maxSessionCount, TcpNet* pNetwork, NetworkLib::ServerConfig* pConfig, ILog* pLogger)
 		{
-			m_pRefLogger = pLogger;
-			m_pRefNetwork = pNetwork;
+			_refLogger = pLogger;
+			_refNetwork = pNetwork;
 
 			for (int i = 0; i < maxSessionCount; ++i)
 			{
-				ConnectedUserList.emplace_back(ConnectedUser());
+				_connectedUserList.emplace_back(ConnectedUser());
 			}
 
-			m_IsLoginCheck = pConfig->IsLoginCheck;
+			_isLoginCheck = pConfig->IsLoginCheck;
 		}
 
 		void SetConnectSession(const int sessionIndex)
 		{
-			time(&ConnectedUserList[sessionIndex].m_ConnectedTime);
+			time(&_connectedUserList[sessionIndex]._connectedTime);
 		}
 
 		void SetLogin(const int sessionIndex)
 		{
-			ConnectedUserList[sessionIndex].m_IsLoginSuccess = true;
+			_connectedUserList[sessionIndex]._isLoginSuccess = true;
 		}
 
 		void SetDisConnectSession(const int sessionIndex)
 		{
-			ConnectedUserList[sessionIndex].Clear();
+			_connectedUserList[sessionIndex].Clear();
 		}
 
 		void LoginCheck()
 		{
-			if (m_IsLoginCheck == false) {
+			if (_isLoginCheck == false) {
 				return;
 			}
 
 			auto curTime = std::chrono::system_clock::now();
-			auto diffTime = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - m_LatestLoginCheckTime);
+			auto diffTime = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _latestLoginCheckTime);
 
 			// 60밀리초 마다 검사
 			if (diffTime.count() < 60)
@@ -72,52 +72,52 @@ namespace LogicLib
 			}
 			else
 			{
-				m_LatestLoginCheckTime = curTime;
+				_latestLoginCheckTime = curTime;
 			}
 
 			auto curSecTime = std::chrono::system_clock::to_time_t(curTime);
 
-			const auto maxSessionCount = (int)ConnectedUserList.size();
+			const auto maxSessionCount = (int)_connectedUserList.size();
 
-			if (m_LatestLogincheckIndex >= maxSessionCount) {
-				m_LatestLogincheckIndex = -1;
+			if (_latestLogincheckIndex >= maxSessionCount) {
+				_latestLogincheckIndex = -1;
 			}
 
-			++m_LatestLogincheckIndex;
+			++_latestLogincheckIndex;
 
-			auto lastCheckIndex = m_LatestLogincheckIndex + 100;
+			auto lastCheckIndex = _latestLogincheckIndex + 100;
 			if (lastCheckIndex > maxSessionCount) {
 				lastCheckIndex = maxSessionCount;
 			}
 
-			for (; m_LatestLogincheckIndex < lastCheckIndex; ++m_LatestLogincheckIndex)
+			for (; _latestLogincheckIndex < lastCheckIndex; ++_latestLogincheckIndex)
 			{
-				auto i = m_LatestLogincheckIndex;
+				auto i = _latestLogincheckIndex;
 
-				if (ConnectedUserList[i].m_ConnectedTime == 0 ||
-					ConnectedUserList[i].m_IsLoginSuccess == false)
+				if (_connectedUserList[i]._connectedTime == 0 ||
+					_connectedUserList[i]._isLoginSuccess == false)
 				{
 					continue;
 				}
 
-				auto diff = curSecTime - ConnectedUserList[i].m_ConnectedTime;
+				auto diff = curSecTime - _connectedUserList[i]._connectedTime;
 				if (diff >= 180)
 				{
-					m_pRefLogger->Write(NetworkLib::LOG_TYPE::L_WARN, "%s | Login Wait Time Over. sessionIndex(%d).", __FUNCTION__, i);
-					m_pRefNetwork->ForcingClose(i);
+					_refLogger->Write(NetworkLib::LOG_TYPE::L_WARN, "%s | Login Wait Time Over. sessionIndex(%d).", __FUNCTION__, i);
+					_refNetwork->ForcingClose(i);
 				}
 			}
 		}
 
 	private:
-		ILog* m_pRefLogger;
-		TcpNet* m_pRefNetwork;
+		ILog* _refLogger;
+		TcpNet* _refNetwork;
 
-		std::vector<ConnectedUser> ConnectedUserList;
+		std::vector<ConnectedUser> _connectedUserList;
 
-		bool m_IsLoginCheck = false;
+		bool _isLoginCheck = false;
 
-		std::chrono::system_clock::time_point m_LatestLoginCheckTime = std::chrono::system_clock::now();
-		int m_LatestLogincheckIndex = -1;
+		std::chrono::system_clock::time_point _latestLoginCheckTime = std::chrono::system_clock::now();
+		int _latestLogincheckIndex = -1;
 	};
 }

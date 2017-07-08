@@ -45,44 +45,44 @@ namespace LogicLib
 		void StateCheck();
 	
 	private:
-		ILog* m_pRefLogger;
-		TcpNet* m_pRefNetwork;
+		ILog* _refLogger;
+		TcpNet* _refNetwork;
 				
-		UserManager* m_pRefUserMgr;
-		LobbyManager* m_pRefLobbyMgr;
+		UserManager* _refUserMgr;
+		LobbyManager* _refLobbyMgr;
 
-		std::unique_ptr<ConnectedUserManager> m_pConnectedUserManager;
+		std::unique_ptr<ConnectedUserManager> _connectedUserManager;
 						
 	private:
-		ERROR_CODE NtfSysConnctSession(PacketInfo packetInfo);
-		ERROR_CODE NtfSysCloseSession(PacketInfo packetInfo);
+		ERROR_CODE ntfSysConnctSession(PacketInfo packetInfo);
+		ERROR_CODE ntfSysCloseSession(PacketInfo packetInfo);
 		
-		ERROR_CODE Login(PacketInfo packetInfo);
+		ERROR_CODE login(PacketInfo packetInfo);
 		
-		ERROR_CODE LobbyList(PacketInfo packetInfo);
+		ERROR_CODE lobbyList(PacketInfo packetInfo);
 
-		ERROR_CODE LobbyEnter(PacketInfo packetInfo);
+		ERROR_CODE lobbyEnter(PacketInfo packetInfo);
 
-		ERROR_CODE LobbyRoomList(PacketInfo packetInfo);
+		ERROR_CODE lobbyRoomList(PacketInfo packetInfo);
 
-		ERROR_CODE LobbyUserList(PacketInfo packetInfo);
+		ERROR_CODE lobbyUserList(PacketInfo packetInfo);
 
-		ERROR_CODE LobbyChat(PacketInfo packetInfo);
+		ERROR_CODE lobbyChat(PacketInfo packetInfo);
 
-		ERROR_CODE LobbyLeave(PacketInfo packetInfo);
+		ERROR_CODE lobbyLeave(PacketInfo packetInfo);
 
-		ERROR_CODE RoomEnter(PacketInfo packetInfo);
+		ERROR_CODE roomEnter(PacketInfo packetInfo);
 
-		ERROR_CODE RoomLeave(PacketInfo packetInfo);
+		ERROR_CODE roomLeave(PacketInfo packetInfo);
 
-		ERROR_CODE RoomChat(PacketInfo packetInfo);
+		ERROR_CODE roomChat(PacketInfo packetInfo);
 
-		ERROR_CODE RoomMasterGameStart(PacketInfo packetInfo);
+		ERROR_CODE roomMasterGameStart(PacketInfo packetInfo);
 
-		ERROR_CODE RoomGameStart(PacketInfo packetInfo);
+		ERROR_CODE roomGameStart(PacketInfo packetInfo);
 
 
 
-		ERROR_CODE DevEcho(PacketInfo packetInfo);
+		ERROR_CODE devEcho(PacketInfo packetInfo);
 	};
 }

@@ -36,6 +36,7 @@ namespace LogicLib
 		using ILog = NetworkLib::ILog;
 
 	public:
+
 		LobbyManager();
 		virtual ~LobbyManager();
 
@@ -45,17 +46,15 @@ namespace LogicLib
 
 
 	public:
+
 		void SendLobbyListInfo(const int sessionIndex);
 
-
-	
-
-
 	private:
-		ILog* m_pRefLogger;
-		TcpNet* m_pRefNetwork;
 
-		std::vector<Lobby> m_LobbyList;
+		ILog* _refLogger;
+		TcpNet* _refNetwork;
+
+		std::vector<Lobby> _lobbyList;
 		
 	};
 }

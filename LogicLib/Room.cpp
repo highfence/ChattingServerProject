@@ -18,82 +18,82 @@ namespace LogicLib
 
 	Room::~Room()
 	{
-		if (m_pGame != nullptr) {
-			delete m_pGame;
+		if (_game != nullptr) {
+			delete _game;
 		}
 	}
 	
 	void Room::Init(const short index, const short maxUserCount)
 	{
-		m_Index = index;
-		m_MaxUserCount = maxUserCount;
+		_index = index;
+		_maxUserCount = maxUserCount;
 
-		m_pGame = new Game;
+		_game = new Game;
 	}
 
 	void Room::SetNetwork(TcpNet* pNetwork, ILog* pLogger)
 	{
-		m_pRefLogger = pLogger;
-		m_pRefNetwork = pNetwork;
+		_refLogger = pLogger;
+		_refNetwork = pNetwork;
 	}
 
 	void Room::Clear()
 	{
-		m_IsUsed = false;
-		m_Title = L"";
-		m_UserList.clear();
+		_isUsed = false;
+		_title = L"";
+		_userList.clear();
 	}
 
 	Game* Room::GetGameObj()
 	{
-		return m_pGame;
+		return _game;
 	}
 
 	ERROR_CODE Room::CreateRoom(const wchar_t* pRoomTitle)
 	{
-		if (m_IsUsed) {
+		if (_isUsed) {
 			return ERROR_CODE::ROOM_ENTER_CREATE_FAIL;
 		}
 
-		m_IsUsed = true;
-		m_Title = pRoomTitle;
+		_isUsed = true;
+		_title = pRoomTitle;
 
 		return ERROR_CODE::NONE;
 	}
 
 	ERROR_CODE Room::EnterUser(User* pUser)
 	{
-		if (m_IsUsed == false) {
+		if (_isUsed == false) {
 			return ERROR_CODE::ROOM_ENTER_NOT_CREATED;
 		}
 
-		if (m_UserList.size() == m_MaxUserCount) {
+		if (_userList.size() == static_cast<unsigned int>(_maxUserCount)) {
 			return ERROR_CODE::ROOM_ENTER_MEMBER_FULL;
 		}
 
-		m_UserList.push_back(pUser);
+		_userList.push_back(pUser);
 		return ERROR_CODE::NONE;
 	}
 
 	bool Room::IsMaster(const short userIndex)
 	{
-		return m_UserList[0]->GetIndex() == userIndex ? true : false;
+		return _userList[0]->GetIndex() == userIndex ? true : false;
 	}
 
 	ERROR_CODE Room::LeaveUser(const short userIndex)
 	{
-		if (m_IsUsed == false) {
+		if (_isUsed == false) {
 			return ERROR_CODE::ROOM_ENTER_NOT_CREATED;
 		}
 
-		auto iter = std::find_if(std::begin(m_UserList), std::end(m_UserList), [userIndex](auto pUser) { return pUser->GetIndex() == userIndex; });
-		if (iter == std::end(m_UserList)) {
+		auto iter = std::find_if(std::begin(_userList), std::end(_userList), [userIndex](auto pUser) { return pUser->GetIndex() == userIndex; });
+		if (iter == std::end(_userList)) {
 			return ERROR_CODE::ROOM_LEAVE_NOT_MEMBER;
 		}
 		
-		m_UserList.erase(iter);
+		_userList.erase(iter);
 
-		if (m_UserList.empty()) 
+		if (_userList.empty()) 
 		{
 			Clear();
 		}
@@ -103,13 +103,13 @@ namespace LogicLib
 
 	void Room::SendToAllUser(const short packetId, const short dataSize, char* pData, const int passUserindex)
 	{
-		for (auto pUser : m_UserList)
+		for (auto pUser : _userList)
 		{
 			if (pUser->GetIndex() == passUserindex) {
 				continue;
 			}
 
-			m_pRefNetwork->SendData(pUser->GetSessioIndex(), packetId, dataSize, pData);
+			_refNetwork->SendData(pUser->GetSessioIndex(), packetId, dataSize, pData);
 		}
 	}
 
@@ -123,7 +123,7 @@ namespace LogicLib
 
 	void Room::NotifyLeaveUserInfo(const char* pszUserID)
 	{
-		if (m_IsUsed == false) {
+		if (_isUsed == false) {
 			return;
 		}
 
@@ -144,9 +144,9 @@ namespace LogicLib
 
 	void Room::Update()
 	{
-		if (m_pGame->GetState() == GameState::ING)
+		if (_game->GetState() == GameState::ING)
 		{
-			if (m_pGame->CheckSelectTime())
+			if (_game->CheckSelectTime())
 			{
 				//선택 안하는 사람이 지도록 한
 			}

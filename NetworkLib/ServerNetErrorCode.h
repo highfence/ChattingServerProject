@@ -40,6 +40,6 @@ namespace NetworkLib
 
 		NET_ERROR_CODE Error = NET_ERROR_CODE::NONE;
 		wchar_t Msg[MAX_NET_ERROR_STRING_COUNT] = { 0, };
-		int Vlaue = 0;
+		int Value = 0;
 	};
 }

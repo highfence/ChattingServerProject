@@ -18,8 +18,8 @@ namespace LogicLib
 
 	void Lobby::Init(const short lobbyIndex, const short maxLobbyUserCount, const short maxRoomCountByLobby, const short maxRoomUserCount)
 	{
-		m_LobbyIndex = lobbyIndex;
-		m_MaxUserCount = (short)maxLobbyUserCount;
+		_lobbyIndex = lobbyIndex;
+		_maxUserCount = (short)maxLobbyUserCount;
 
 		for (int i = 0; i < maxLobbyUserCount; ++i)
 		{
@@ -27,32 +27,32 @@ namespace LogicLib
 			lobbyUser.Index = (short)i;
 			lobbyUser.pUser = nullptr;
 
-			m_UserList.push_back(lobbyUser);
+			_userList.push_back(lobbyUser);
 		}
 
 		for (int i = 0; i < maxRoomCountByLobby; ++i)
 		{
-			m_RoomList.emplace_back(new Room());
-			m_RoomList[i]->Init((short)i, maxRoomUserCount);
+			_roomList.emplace_back(new Room());
+			_roomList[i]->Init((short)i, maxRoomUserCount);
 		}
 	}
 
 	void Lobby::Release()
 	{
-		for (int i = 0; i < (int)m_RoomList.size(); ++i)
+		for (int i = 0; i < (int)_roomList.size(); ++i)
 		{
-			delete m_RoomList[i];
+			delete _roomList[i];
 		}
 
-		m_RoomList.clear();
+		_roomList.clear();
 	}
 
 	void Lobby::SetNetwork(TcpNet* pNetwork, ILog* pLogger)
 	{
-		m_pRefLogger = pLogger;
-		m_pRefNetwork = pNetwork;
+		_refLogger = pLogger;
+		_refNetwork = pNetwork;
 
-		for (auto pRoom : m_RoomList)
+		for (auto pRoom : _roomList)
 		{
 			pRoom->SetNetwork(pNetwork, pLogger);
 		}
@@ -60,32 +60,32 @@ namespace LogicLib
 
 	ERROR_CODE Lobby::EnterUser(User* pUser)
 	{
-		if (m_UserIndexDic.size() >= m_MaxUserCount) {
+		if (_userIndexDic.size() >= static_cast<unsigned int>(_maxUserCount)) {
 			return ERROR_CODE::LOBBY_ENTER_MAX_USER_COUNT;
 		}
 
-		if (FindUser(pUser->GetIndex()) != nullptr) {
+		if (findUser(pUser->GetIndex()) != nullptr) {
 			return ERROR_CODE::LOBBY_ENTER_USER_DUPLICATION;
 		}
 
-		auto addRet = AddUser(pUser);
+		auto addRet = addUser(pUser);
 		if (addRet != ERROR_CODE::NONE) {
 			return addRet;
 		}
 
-		pUser->EnterLobby(m_LobbyIndex);
+		pUser->EnterLobby(_lobbyIndex);
 
-		m_UserIndexDic.insert({ pUser->GetIndex(), pUser });
-		m_UserIDDic.insert({ pUser->GetID().c_str(), pUser });
+		_userIndexDic.insert({ pUser->GetIndex(), pUser });
+		_userIDDic.insert({ pUser->GetID().c_str(), pUser });
 
 		return ERROR_CODE::NONE;
 	}
 
 	ERROR_CODE Lobby::LeaveUser(const int userIndex)
 	{
-		RemoveUser(userIndex);
+		removeUser(userIndex);
 
-		auto pUser = FindUser(userIndex);
+		auto pUser = findUser(userIndex);
 
 		if (pUser == nullptr) {
 			return ERROR_CODE::LOBBY_LEAVE_USER_NVALID_UNIQUEINDEX;
@@ -93,28 +93,28 @@ namespace LogicLib
 
 		pUser->LeaveLobby();
 
-		m_UserIndexDic.erase(pUser->GetIndex());
-		m_UserIDDic.erase(pUser->GetID().c_str());
+		_userIndexDic.erase(pUser->GetIndex());
+		_userIDDic.erase(pUser->GetID().c_str());
 		
 		return ERROR_CODE::NONE;
 	}
 		
-	User* Lobby::FindUser(const int userIndex)
+	User* Lobby::findUser(const int userIndex)
 	{
-		auto findIter = m_UserIndexDic.find(userIndex);
+		auto findIter = _userIndexDic.find(userIndex);
 
-		if (findIter == m_UserIndexDic.end()) {
+		if (findIter == _userIndexDic.end()) {
 			return nullptr;
 		}
 
 		return (User*)findIter->second;
 	}
 
-	ERROR_CODE Lobby::AddUser(User* pUser)
+	ERROR_CODE Lobby::addUser(User* pUser)
 	{
-		auto findIter = std::find_if(std::begin(m_UserList), std::end(m_UserList), [](auto& lobbyUser) { return lobbyUser.pUser == nullptr; });
+		auto findIter = std::find_if(std::begin(_userList), std::end(_userList), [](auto& lobbyUser) { return lobbyUser.pUser == nullptr; });
 		
-		if (findIter == std::end(m_UserList)) {
+		if (findIter == std::end(_userList)) {
 			return ERROR_CODE::LOBBY_ENTER_EMPTY_USER_LIST;
 		}
 
@@ -122,14 +122,14 @@ namespace LogicLib
 		return ERROR_CODE::NONE;
 	}
 
-	void Lobby::RemoveUser(const int userIndex)
+	void Lobby::removeUser(const int userIndex)
 	{
-		auto findIter = std::find_if(std::begin(m_UserList), std::end(m_UserList), [userIndex](auto& lobbyUser) 
+		auto findIter = std::find_if(std::begin(_userList), std::end(_userList), [userIndex](auto& lobbyUser) 
 		{
 			return lobbyUser.pUser != nullptr && lobbyUser.pUser->GetIndex() == userIndex;
 		});
 
-		if (findIter == std::end(m_UserList)) {
+		if (findIter == std::end(_userList)) {
 			return;
 		}
 
@@ -138,7 +138,7 @@ namespace LogicLib
 
 	short Lobby::GetUserCount()
 	{ 
-		return static_cast<short>(m_UserIndexDic.size()); 
+		return static_cast<short>(_userIndexDic.size()); 
 	}
 
 
@@ -147,7 +147,7 @@ namespace LogicLib
 		NCommon::PktLobbyNewUserInfoNtf pkt;
 		strncpy_s(pkt.UserID, _countof(pkt.UserID), pUser->GetID().c_str(), NCommon::MAX_USER_ID_SIZE);
 
-		SendToAllUser((short)PACKET_ID::LOBBY_ENTER_USER_NTF, sizeof(pkt), (char*)&pkt, pUser->GetIndex());
+		sendToAllUser((short)PACKET_ID::LOBBY_ENTER_USER_NTF, sizeof(pkt), (char*)&pkt, pUser->GetIndex());
 	}
 
 	void Lobby::NotifyLobbyLeaveUserInfo(User* pUser)
@@ -155,12 +155,12 @@ namespace LogicLib
 		NCommon::PktLobbyLeaveUserInfoNtf pkt;
 		strncpy_s(pkt.UserID, _countof(pkt.UserID), pUser->GetID().c_str(), NCommon::MAX_USER_ID_SIZE);
 
-		SendToAllUser((short)PACKET_ID::LOBBY_LEAVE_USER_NTF, sizeof(pkt), (char*)&pkt, pUser->GetIndex());
+		sendToAllUser((short)PACKET_ID::LOBBY_LEAVE_USER_NTF, sizeof(pkt), (char*)&pkt, pUser->GetIndex());
 	}
 
 	ERROR_CODE Lobby::SendRoomList(const int sessionId, const short startRoomId)
 	{
-		if (startRoomId < 0 || startRoomId >= (m_RoomList.size() - 1)) {
+		if (startRoomId < 0 || static_cast<unsigned int>(startRoomId) >= (_roomList.size() - 1)) {
 			return ERROR_CODE::LOBBY_ROOM_LIST_INVALID_START_ROOM_INDEX;
 		}
 
@@ -168,9 +168,9 @@ namespace LogicLib
 		short roomCount = 0;
 		int lastCheckedIndex = 0;
 
-		for (int i = startRoomId; i < m_RoomList.size(); ++i)
+		for (unsigned int i = startRoomId; i < _roomList.size(); ++i)
 		{
-			auto pRoom = m_RoomList[i];
+			auto pRoom = _roomList[i];
 			lastCheckedIndex = i;
 
 			if (pRoom->IsUsed() == false) {
@@ -190,18 +190,18 @@ namespace LogicLib
 
 		pktRes.Count = roomCount;
 
-		if (roomCount <= 0 || (lastCheckedIndex + 1) == m_RoomList.size()) {
+		if (roomCount <= 0 || static_cast<unsigned int>(lastCheckedIndex + 1) == _roomList.size()) {
 			pktRes.IsEnd = true;
 		}
 
-		m_pRefNetwork->SendData(sessionId, (short)PACKET_ID::LOBBY_ENTER_ROOM_LIST_RES, sizeof(pktRes), (char*)&pktRes);
+		_refNetwork->SendData(sessionId, (short)PACKET_ID::LOBBY_ENTER_ROOM_LIST_RES, sizeof(pktRes), (char*)&pktRes);
 
 		return ERROR_CODE::NONE;
 	}
 
 	ERROR_CODE Lobby::SendUserList(const int sessionId, const short startUserIndex)
 	{
-		if (startUserIndex < 0 || startUserIndex >= (m_UserList.size() - 1)) {
+		if (startUserIndex < 0 || static_cast<unsigned int>(startUserIndex) >= (_userList.size() - 1)) {
 			return ERROR_CODE::LOBBY_USER_LIST_INVALID_START_USER_INDEX;
 		}
 
@@ -209,9 +209,9 @@ namespace LogicLib
 		NCommon::PktLobbyUserListRes pktRes;
 		short userCount = 0;
 
-		for (int i = startUserIndex; i < m_UserList.size(); ++i)
+		for (unsigned int i = startUserIndex; i < _userList.size(); ++i)
 		{
-			auto& lobbyUser = m_UserList[i];
+			auto& lobbyUser = _userList[i];
 			lastCheckedIndex = i;
 
 			if (lobbyUser.pUser == nullptr || lobbyUser.pUser->IsCurDomainInLobby() == false) {
@@ -230,18 +230,18 @@ namespace LogicLib
 
 		pktRes.Count = userCount;
 
-		if (userCount <= 0 || (lastCheckedIndex + 1) == m_UserList.size()) {
+		if (userCount <= 0 || static_cast<unsigned int>(lastCheckedIndex + 1) == _userList.size()) {
 			pktRes.IsEnd = true;
 		}
 
-		m_pRefNetwork->SendData(sessionId, (short)PACKET_ID::LOBBY_ENTER_USER_LIST_RES, sizeof(pktRes), (char*)&pktRes);
+		_refNetwork->SendData(sessionId, (short)PACKET_ID::LOBBY_ENTER_USER_LIST_RES, sizeof(pktRes), (char*)&pktRes);
 
 		return ERROR_CODE::NONE;
 	}
 
-	void Lobby::SendToAllUser(const short packetId, const short dataSize, char* pData, const int passUserindex)
+	void Lobby::sendToAllUser(const short packetId, const short dataSize, char* pData, const int passUserindex)
 	{
-		for (auto& pUser : m_UserIndexDic)
+		for (auto& pUser : _userIndexDic)
 		{
 			if (pUser.second->GetIndex() == passUserindex) {
 				continue;
@@ -251,16 +251,16 @@ namespace LogicLib
 				continue;
 			}
 
-			m_pRefNetwork->SendData(pUser.second->GetSessioIndex(), packetId, dataSize, pData);
+			_refNetwork->SendData(pUser.second->GetSessioIndex(), packetId, dataSize, pData);
 		}
 	}
 
 	Room* Lobby::CreateRoom()
 	{
-		for (int i = 0; i < (int)m_RoomList.size(); ++i)
+		for (int i = 0; i < (int)_roomList.size(); ++i)
 		{
-			if (m_RoomList[i]->IsUsed() == false) {
-				return m_RoomList[i];
+			if (_roomList[i]->IsUsed() == false) {
+				return _roomList[i];
 			}
 		}
 		return nullptr;
@@ -268,30 +268,30 @@ namespace LogicLib
 
 	Room* Lobby::GetRoom(const short roomIndex)
 	{
-		if (roomIndex < 0 || roomIndex >= m_RoomList.size()) {
+		if (roomIndex < 0 || static_cast<unsigned int>(roomIndex) >= _roomList.size()) {
 			return nullptr;
 		}
 
-		return m_RoomList[roomIndex];
+		return _roomList[roomIndex];
 	}
 
 	void Lobby::NotifyChangedRoomInfo(const short roomIndex)
 	{
 		NCommon::PktChangedRoomInfoNtf pktNtf;
 				
-		auto pRoom = m_RoomList[roomIndex];
+		auto pRoom = _roomList[roomIndex];
 		
 		pktNtf.RoomInfo.RoomIndex = pRoom->GetIndex();
 		pktNtf.RoomInfo.RoomUserCount = pRoom->GetUserCount();
 
-		if (m_RoomList[roomIndex]->IsUsed()) {
+		if (_roomList[roomIndex]->IsUsed()) {
 			wcsncpy_s(pktNtf.RoomInfo.RoomTitle, NCommon::MAX_ROOM_TITLE_SIZE + 1, pRoom->GetTitle(), NCommon::MAX_ROOM_TITLE_SIZE);
 		}
 		else {
 			pktNtf.RoomInfo.RoomTitle[0] = L'\0';
 		}
 
-		SendToAllUser((short)PACKET_ID::ROOM_CHANGED_INFO_NTF, sizeof(pktNtf), (char*)&pktNtf);
+		sendToAllUser((short)PACKET_ID::ROOM_CHANGED_INFO_NTF, sizeof(pktNtf), (char*)&pktNtf);
 	}
 
 	void Lobby::NotifyChat(const int sessionIndex, const char* pszUserID, const wchar_t* pszMsg)
@@ -300,6 +300,6 @@ namespace LogicLib
 		strncpy_s(pkt.UserID, _countof(pkt.UserID), pszUserID, NCommon::MAX_USER_ID_SIZE);
 		wcsncpy_s(pkt.Msg, NCommon::MAX_LOBBY_CHAT_MSG_SIZE + 1, pszMsg, NCommon::MAX_LOBBY_CHAT_MSG_SIZE);
 
-		SendToAllUser((short)PACKET_ID::LOBBY_CHAT_NTF, sizeof(pkt), (char*)&pkt, sessionIndex);
+		sendToAllUser((short)PACKET_ID::LOBBY_CHAT_NTF, sizeof(pkt), (char*)&pkt, sessionIndex);
 	}
 }

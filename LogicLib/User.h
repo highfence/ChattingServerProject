@@ -19,86 +19,86 @@ namespace LogicLib
 
 		void Init(const short index)
 		{
-			m_Index = index;
+			_index = index;
 		}
 
 		void Clear()
 		{			
-			m_SessionIndex = 0;
-			m_ID = "";
-			m_IsConfirm = false;
-			m_CurDomainState = DOMAIN_STATE::NONE;
-			m_LobbyIndex = -1;
-			m_RoomIndex = -1;
+			_sessionIndex = 0;
+			_id = "";
+			_isConfirm = false;
+			_curDomainState = DOMAIN_STATE::NONE;
+			_lobbyIndex = -1;
+			_roomIndex = -1;
 		}
 
 		void Set(const int sessionIndex, const char* pszID)
 		{
-			m_IsConfirm = true;
-			m_CurDomainState = DOMAIN_STATE::LOGIN;
+			_isConfirm = true;
+			_curDomainState = DOMAIN_STATE::LOGIN;
 
-			m_SessionIndex = sessionIndex;
-			m_ID = pszID;
+			_sessionIndex = sessionIndex;
+			_id = pszID;
 
 		}
 
-		short GetIndex() { return m_Index; }
+		short GetIndex() { return _index; }
 
-		int GetSessioIndex() { return m_SessionIndex;  }
+		int GetSessioIndex() { return _sessionIndex;  }
 
-		std::string& GetID() { return m_ID;  }
+		std::string& GetID() { return _id;  }
 
-		bool IsConfirm() { return m_IsConfirm;  }
+		bool IsConfirm() { return _isConfirm;  }
 
-		short GetLobbyIndex() { return m_LobbyIndex; }
+		short GetLobbyIndex() { return _lobbyIndex; }
 
 		void EnterLobby(const short lobbyIndex)
 		{
-			m_LobbyIndex = lobbyIndex;
-			m_CurDomainState = DOMAIN_STATE::LOBBY;
+			_lobbyIndex = lobbyIndex;
+			_curDomainState = DOMAIN_STATE::LOBBY;
 		}
 		
 		void LeaveLobby()
 		{
-			m_CurDomainState = DOMAIN_STATE::LOGIN;
+			_curDomainState = DOMAIN_STATE::LOGIN;
 		}
 
 		
-		short GetRoomIndex() { return m_RoomIndex; }
+		short GetRoomIndex() { return _roomIndex; }
 
 		void EnterRoom(const short lobbyIndex, const short roomIndex)
 		{
-			m_LobbyIndex = lobbyIndex;
-			m_RoomIndex = roomIndex;
-			m_CurDomainState = DOMAIN_STATE::ROOM;
+			_lobbyIndex = lobbyIndex;
+			_roomIndex = roomIndex;
+			_curDomainState = DOMAIN_STATE::ROOM;
 		}
 
 		bool IsCurDomainInLogIn() {
-			return m_CurDomainState == DOMAIN_STATE::LOGIN ? true : false;
+			return _curDomainState == DOMAIN_STATE::LOGIN ? true : false;
 		}
 		
 		bool IsCurDomainInLobby() {
-			return m_CurDomainState == DOMAIN_STATE::LOBBY ? true : false;
+			return _curDomainState == DOMAIN_STATE::LOBBY ? true : false;
 		}
 
 		bool IsCurDomainInRoom() {
-			return m_CurDomainState == DOMAIN_STATE::ROOM ? true : false;
+			return _curDomainState == DOMAIN_STATE::ROOM ? true : false;
 		}
 
 		
 	protected:
-		short m_Index = -1;
+		short _index = -1;
 		
-		int m_SessionIndex = -1;
+		int _sessionIndex = -1;
 
-		std::string m_ID;
+		std::string _id;
 		
-		bool m_IsConfirm = false;
+		bool _isConfirm = false;
 		
-		DOMAIN_STATE m_CurDomainState = DOMAIN_STATE::NONE;
+		DOMAIN_STATE _curDomainState = DOMAIN_STATE::NONE;
 
-		short m_LobbyIndex = -1;
+		short _lobbyIndex = -1;
 
-		short m_RoomIndex = -1;
+		short _roomIndex = -1;
 	};
 }

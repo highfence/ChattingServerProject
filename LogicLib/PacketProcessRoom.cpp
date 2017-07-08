@@ -13,13 +13,13 @@ using PACKET_ID = NCommon::PACKET_ID;
 
 namespace LogicLib
 {
-	ERROR_CODE PacketProcess::RoomEnter(PacketInfo packetInfo)
+	ERROR_CODE PacketProcess::roomEnter(PacketInfo packetInfo)
 	{
 	CHECK_START
 		auto reqPkt = (NCommon::PktRoomEnterReq*)packetInfo.pRefData;
 		NCommon::PktRoomEnterRes resPkt;
 
-		auto pUserRet = m_pRefUserMgr->GetUser(packetInfo.SessionIndex);
+		auto pUserRet = _refUserMgr->GetUser(packetInfo.SessionIndex);
 		auto errorCode = std::get<0>(pUserRet);
 
 		if (errorCode != ERROR_CODE::NONE) {
@@ -33,7 +33,7 @@ namespace LogicLib
 		}
 
 		auto lobbyIndex = pUser->GetLobbyIndex();
-		auto pLobby = m_pRefLobbyMgr->GetLobby(lobbyIndex);
+		auto pLobby = _refLobbyMgr->GetLobby(lobbyIndex);
 		if (pLobby == nullptr) {
 			CHECK_ERROR(ERROR_CODE::ROOM_ENTER_INVALID_LOBBY_INDEX);
 		}
@@ -79,21 +79,21 @@ namespace LogicLib
 		// 룸에 새 유저 들어왔다고 알린다
 		pRoom->NotifyEnterUserInfo(pUser->GetIndex(), pUser->GetID().c_str());
 		
-		m_pRefNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_ENTER_RES, sizeof(resPkt), (char*)&resPkt);
+		_refNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_ENTER_RES, sizeof(resPkt), (char*)&resPkt);
 		return ERROR_CODE::NONE;
 
 	CHECK_ERR:
 		resPkt.SetError(__result);
-		m_pRefNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_ENTER_RES, sizeof(resPkt), (char*)&resPkt);
+		_refNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_ENTER_RES, sizeof(resPkt), (char*)&resPkt);
 		return __result;
 	}
 
-	ERROR_CODE PacketProcess::RoomLeave(PacketInfo packetInfo)
+	ERROR_CODE PacketProcess::roomLeave(PacketInfo packetInfo)
 	{
 	CHECK_START
 		NCommon::PktRoomLeaveRes resPkt;
 
-		auto pUserRet = m_pRefUserMgr->GetUser(packetInfo.SessionIndex);
+		auto pUserRet = _refUserMgr->GetUser(packetInfo.SessionIndex);
 		auto errorCode = std::get<0>(pUserRet);
 
 		if (errorCode != ERROR_CODE::NONE) {
@@ -108,7 +108,7 @@ namespace LogicLib
 		}
 
 		auto lobbyIndex = pUser->GetLobbyIndex();
-		auto pLobby = m_pRefLobbyMgr->GetLobby(lobbyIndex);
+		auto pLobby = _refLobbyMgr->GetLobby(lobbyIndex);
 		if (pLobby == nullptr) {
 			CHECK_ERROR(ERROR_CODE::ROOM_ENTER_INVALID_LOBBY_INDEX);
 		}
@@ -135,22 +135,22 @@ namespace LogicLib
 		// 로비에 바뀐 방 정보를 통보
 		pLobby->NotifyChangedRoomInfo(pRoom->GetIndex());
 		
-		m_pRefNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_LEAVE_RES, sizeof(resPkt), (char*)&resPkt);
+		_refNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_LEAVE_RES, sizeof(resPkt), (char*)&resPkt);
 		return ERROR_CODE::NONE;
 
 	CHECK_ERR:
 		resPkt.SetError(__result);
-		m_pRefNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_LEAVE_RES, sizeof(resPkt), (char*)&resPkt);
+		_refNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_LEAVE_RES, sizeof(resPkt), (char*)&resPkt);
 		return __result;
 	}
 
-	ERROR_CODE PacketProcess::RoomChat(PacketInfo packetInfo)
+	ERROR_CODE PacketProcess::roomChat(PacketInfo packetInfo)
 	{
 	CHECK_START
 		auto reqPkt = (NCommon::PktRoomChatReq*)packetInfo.pRefData;
 		NCommon::PktRoomChatRes resPkt;
 
-		auto pUserRet = m_pRefUserMgr->GetUser(packetInfo.SessionIndex);
+		auto pUserRet = _refUserMgr->GetUser(packetInfo.SessionIndex);
 		auto errorCode = std::get<0>(pUserRet);
 
 		if (errorCode != ERROR_CODE::NONE) {
@@ -164,7 +164,7 @@ namespace LogicLib
 		}
 
 		auto lobbyIndex = pUser->GetLobbyIndex();
-		auto pLobby = m_pRefLobbyMgr->GetLobby(lobbyIndex);
+		auto pLobby = _refLobbyMgr->GetLobby(lobbyIndex);
 		if (pLobby == nullptr) {
 			CHECK_ERROR(ERROR_CODE::ROOM_CHAT_INVALID_LOBBY_INDEX);
 		}
@@ -176,21 +176,21 @@ namespace LogicLib
 
 		pRoom->NotifyChat(pUser->GetSessioIndex(), pUser->GetID().c_str(), reqPkt->Msg);
 				
-		m_pRefNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_CHAT_RES, sizeof(resPkt), (char*)&resPkt);
+		_refNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_CHAT_RES, sizeof(resPkt), (char*)&resPkt);
 		return ERROR_CODE::NONE;
 
 	CHECK_ERR:
 		resPkt.SetError(__result);
-		m_pRefNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_CHAT_RES, sizeof(resPkt), (char*)&resPkt);
+		_refNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_CHAT_RES, sizeof(resPkt), (char*)&resPkt);
 		return __result;
 	}
 
-	ERROR_CODE PacketProcess::RoomMasterGameStart(PacketInfo packetInfo)
+	ERROR_CODE PacketProcess::roomMasterGameStart(PacketInfo packetInfo)
 	{
 	CHECK_START
 		NCommon::PktRoomMaterGameStartRes resPkt;
 
-		auto pUserRet = m_pRefUserMgr->GetUser(packetInfo.SessionIndex);
+		auto pUserRet = _refUserMgr->GetUser(packetInfo.SessionIndex);
 		auto errorCode = std::get<0>(pUserRet);
 
 		if (errorCode != ERROR_CODE::NONE) {
@@ -204,7 +204,7 @@ namespace LogicLib
 		}
 
 		auto lobbyIndex = pUser->GetLobbyIndex();
-		auto pLobby = m_pRefLobbyMgr->GetLobby(lobbyIndex);
+		auto pLobby = _refLobbyMgr->GetLobby(lobbyIndex);
 		if (pLobby == nullptr) {
 			CHECK_ERROR(ERROR_CODE::ROOM_MASTER_GAME_START_INVALID_LOBBY_INDEX);
 		}
@@ -241,21 +241,21 @@ namespace LogicLib
 								pUser->GetIndex());
 
 		// 요청자에게 답변을 보낸다.
-		m_pRefNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_MASTER_GAME_START_RES, sizeof(resPkt), (char*)&resPkt);
+		_refNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_MASTER_GAME_START_RES, sizeof(resPkt), (char*)&resPkt);
 		return ERROR_CODE::NONE;
 
 	CHECK_ERR:
 		resPkt.SetError(__result);
-		m_pRefNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_MASTER_GAME_START_RES, sizeof(resPkt), (char*)&resPkt);
+		_refNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_MASTER_GAME_START_RES, sizeof(resPkt), (char*)&resPkt);
 		return __result;
 	}
 
-	ERROR_CODE PacketProcess::RoomGameStart(PacketInfo packetInfo)
+	ERROR_CODE PacketProcess::roomGameStart(PacketInfo packetInfo)
 	{
 	CHECK_START
 		NCommon::PktRoomGameStartRes resPkt;
 
-		auto pUserRet = m_pRefUserMgr->GetUser(packetInfo.SessionIndex);
+		auto pUserRet = _refUserMgr->GetUser(packetInfo.SessionIndex);
 		auto errorCode = std::get<0>(pUserRet);
 
 		if (errorCode != ERROR_CODE::NONE) {
@@ -269,7 +269,7 @@ namespace LogicLib
 		}
 
 		auto lobbyIndex = pUser->GetLobbyIndex();
-		auto pLobby = m_pRefLobbyMgr->GetLobby(lobbyIndex);
+		auto pLobby = _refLobbyMgr->GetLobby(lobbyIndex);
 		if (pLobby == nullptr) {
 			CHECK_ERROR(ERROR_CODE::ROOM_MASTER_GAME_START_INVALID_LOBBY_INDEX);
 		}
@@ -291,7 +291,7 @@ namespace LogicLib
 		// 방의 다른 유저에게 게임 시작 요청을 했음을 알리고
 
 		// 요청자에게 답변을 보낸다.
-		m_pRefNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_GAME_START_RES, sizeof(resPkt), (char*)&resPkt);
+		_refNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_GAME_START_RES, sizeof(resPkt), (char*)&resPkt);
 		
 		
 		// 게임 시작 가능한가?
@@ -303,7 +303,7 @@ namespace LogicLib
 
 	CHECK_ERR:
 		resPkt.SetError(__result);
-		m_pRefNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_GAME_START_RES, sizeof(resPkt), (char*)&resPkt);
+		_refNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_GAME_START_RES, sizeof(resPkt), (char*)&resPkt);
 		return __result;
 	}
 }

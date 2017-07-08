@@ -47,7 +47,7 @@ namespace LogicLib
 
 		void SetNetwork(TcpNet* pNetwork, ILog* pLogger);
 
-		short GetIndex() { return m_LobbyIndex; }
+		short GetIndex() { return _lobbyIndex; }
 
 
 		ERROR_CODE EnterUser(User* pUser);
@@ -70,38 +70,38 @@ namespace LogicLib
 
 		void NotifyChangedRoomInfo(const short roomIndex);
 
-		auto MaxUserCount() { return (short)m_MaxUserCount; }
+		auto MaxUserCount() { return (short)_maxUserCount; }
 
-		auto MaxRoomCount() { return (short)m_RoomList.size(); }
+		auto MaxRoomCount() { return (short)_roomList.size(); }
 
 		void NotifyChat(const int sessionIndex, const char* pszUserID, const wchar_t* pszMsg);
 
 	protected:
-		void SendToAllUser(const short packetId, const short dataSize, char* pData, const int passUserindex = -1);
 
-		
-
-	protected:
-		User* FindUser(const int userIndex);
-
-		ERROR_CODE AddUser(User* pUser);
-
-		void RemoveUser(const int userIndex);
-
+		void sendToAllUser(const short packetId, const short dataSize, char* pData, const int passUserindex = -1);
 
 	protected:
-		ILog* m_pRefLogger;
-		TcpNet* m_pRefNetwork;
+
+		User* findUser(const int userIndex);
+
+		ERROR_CODE addUser(User* pUser);
+
+		void removeUser(const int userIndex);
 
 
-		short m_LobbyIndex = 0;
+	protected:
+		ILog* _refLogger;
+		TcpNet* _refNetwork;
 
-		short m_MaxUserCount = 0;
-		std::vector<LobbyUser> m_UserList;
-		std::unordered_map<int, User*> m_UserIndexDic;
-		std::unordered_map<const char*, User*> m_UserIDDic;
 
-		std::vector<Room*> m_RoomList;
+		short _lobbyIndex = 0;
+
+		short _maxUserCount = 0;
+		std::vector<LobbyUser> _userList;
+		std::unordered_map<int, User*> _userIndexDic;
+		std::unordered_map<const char*, User*> _userIDDic;
+
+		std::vector<Room*> _roomList;
 	};
 }
 
