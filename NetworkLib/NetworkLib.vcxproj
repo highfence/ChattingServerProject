@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{71199B2B-0731-4886-ADEE-779B19154887}</ProjectGuid>
+    <ProjectGuid>{CCDF3761-224C-4936-A8EC-B3BF138A415A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>NetworkLib</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
