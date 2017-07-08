@@ -18,6 +18,16 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Define.h" />
+    <ClInclude Include="ILog.h" />
+    <ClInclude Include="ITcpNetwork.h" />
+    <ClInclude Include="ServerNetErrorCode.h" />
+    <ClInclude Include="TcpNetwork.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TcpNetwork.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{CCDF3761-224C-4936-A8EC-B3BF138A415A}</ProjectGuid>
@@ -127,9 +137,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

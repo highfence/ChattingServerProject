@@ -142,9 +142,12 @@
     <ProjectReference Include="..\..\LogicLib\LogicLib.vcxproj">
       <Project>{a09bb0d3-2e91-4286-978a-70d32ce58e83}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\NetworkLib\NetworkLib.vcxproj">
-      <Project>{71199b2b-0731-4886-adee-779b19154887}</Project>
+    <ProjectReference Include="..\..\NetworkLib\NetworkLib.vcxproj">
+      <Project>{ccdf3761-224c-4936-a8ec-b3bf138a415a}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
