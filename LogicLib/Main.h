@@ -19,12 +19,12 @@ namespace LogicLib
 	class LobbyManager;
 	class PacketProcess;
 
-	class Main
+	class ServerHost
 	{
 	public:
 
-		Main();
-		~Main();
+		ServerHost();
+		~ServerHost();
 
 		ERROR_CODE Init();
 
