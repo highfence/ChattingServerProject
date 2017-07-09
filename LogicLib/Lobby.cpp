@@ -214,7 +214,7 @@ namespace LogicLib
 			auto& lobbyUser = _userList[i];
 			lastCheckedIndex = i;
 
-			if (lobbyUser.pUser == nullptr || lobbyUser.pUser->IsCurDomainInLobby() == false) {
+			if (lobbyUser.pUser == nullptr || lobbyUser.pUser->IsCurDoServerHostInLobby() == false) {
 				continue;
 			}
 
@@ -247,7 +247,7 @@ namespace LogicLib
 				continue;
 			}
 
-			if (pUser.second->IsCurDomainInLobby() == false) {
+			if (pUser.second->IsCurDoServerHostInLobby() == false) {
 				continue;
 			}
 

@@ -55,8 +55,8 @@ namespace LogicLib
 	
 		auto pUser = std::get<1>(pUserRet);
 		
-		if (pUser->IsCurDomainInLogIn() == false) {
-			CHECK_ERROR(ERROR_CODE::LOBBY_LIST_INVALID_DOMAIN);
+		if (pUser->IsCurDoServerHostInLogIn() == false) {
+			CHECK_ERROR(ERROR_CODE::LOBBY_LIST_INVALID_DOServerHost);
 		}
 		
 		_refLobbyMgr->SendLobbyListInfo(packetInfo.SessionIndex);

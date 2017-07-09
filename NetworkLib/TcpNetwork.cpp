@@ -1,6 +1,9 @@
 ﻿#include <stdio.h>
 #include <vector>
 #include <deque>
+#include <thread>
+#include <mutex>
+#include <functional>
 
 #include "ILog.h"
 #include "TcpNetwork.h"
@@ -26,6 +29,17 @@ namespace NetworkLib
 
 	NET_ERROR_CODE TcpNetwork::Init(const ServerConfig* pConfig, ILog* pLogger)
 	{
+#pragma region thread func
+
+		auto startRunThread = [this]()
+		{
+			_isNetworkRunning = true;
+
+			_runningThread = std::thread([this]() { Run(); });
+		};
+
+#pragma endregion
+
 		memcpy(&_config, pConfig, sizeof(ServerConfig));
 
 		_refLogger = pLogger;
@@ -49,6 +63,8 @@ namespace NetworkLib
 			
 		_refLogger->Write(LOG_TYPE::L_INFO, "%s | Session Pool Size: %d", __FUNCTION__, sessionPoolSize);
 
+		startRunThread();
+
 		return NET_ERROR_CODE::NONE;
 	}
 
@@ -60,6 +76,8 @@ namespace NetworkLib
 	RecvPacketInfo TcpNetwork::GetPacketInfo()
 	{
 		RecvPacketInfo packetInfo;
+
+		std::lock_guard<std::mutex> _queueLock(_queueMutex);
 
 		if (_packetQueue.empty() == false)
 		{
@@ -79,27 +97,45 @@ namespace NetworkLib
 		closeSession(SOCKET_CLOSE_CASE::FORCING_CLOSE, static_cast<SOCKET>(_clientSessionPool[sessionIndex].SocketFD), sessionIndex);
 	}
 
-	void TcpNetwork::Run()
+	void TcpNetwork::RegistEventHandle(HANDLE * eventHandle)
 	{
-		auto read_set = _readfds;
-		auto write_set = _readfds;
-		
-		timeval timeout{ 0, 1000 }; //tv_sec, tv_usec
-		auto selectResult = select(0, &read_set, &write_set, 0, &timeout);
-
-		auto isFDSetChanged = runCheckSelectResult(selectResult);
-		if (isFDSetChanged == false)
+		if (eventHandle == nullptr)
 		{
 			return;
 		}
 
-		// Accept
-		if (FD_ISSET(_serverSockfd, &read_set))
+		_processEvent = eventHandle;
+	}
+
+	void TcpNetwork::Run()
+	{
+		while (_isNetworkRunning)
 		{
-			newSession();
+			auto read_set = _readfds;
+			auto write_set = _readfds;
+
+			timeval timeout{ 0, 1000 }; //tv_sec, tv_usec
+			auto selectResult = select(0, &read_set, &write_set, 0, &timeout);
+
+			auto isFDSetChanged = runCheckSelectResult(selectResult);
+			if (isFDSetChanged == false)
+			{
+				continue;
+			}
+
+			// Accept
+			if (FD_ISSET(_serverSockfd, &read_set))
+			{
+				newSession();
+			}
+
+			runCheckSelectClients(read_set, write_set);
+
+			if (_processEvent != nullptr)
+			{
+				SetEvent(_processEvent);
+			}
 		}
-		
-		runCheckSelectClients(read_set, write_set);
 	}
 
 	bool TcpNetwork::runCheckSelectResult(const int result)
@@ -378,10 +414,10 @@ namespace NetworkLib
 
 		int recvPos = 0;
 				
-		if (session.RemainingDataSize > 0)
+		if (session.ReServerHostingDataSize > 0)
 		{
-			memcpy(session.pRecvBuffer, &session.pRecvBuffer[session.PrevReadPosInRecvBuffer], session.RemainingDataSize);
-			recvPos += session.RemainingDataSize;
+			memcpy(session.pRecvBuffer, &session.pRecvBuffer[session.PrevReadPosInRecvBuffer], session.ReServerHostingDataSize);
+			recvPos += session.ReServerHostingDataSize;
 		}
 
 		auto recvSize = recv(fd, &session.pRecvBuffer[recvPos], (MAX_PACKET_BODY_SIZE * 2), 0);
@@ -404,7 +440,7 @@ namespace NetworkLib
 			}
 		}
 
-		session.RemainingDataSize += recvSize;
+		session.ReServerHostingDataSize += recvSize;
 		return NET_ERROR_CODE::NONE;
 	}
 
@@ -413,7 +449,7 @@ namespace NetworkLib
 		auto& session = _clientSessionPool[sessionIndex];
 		
 		auto readPos = 0;
-		const auto dataSize = session.RemainingDataSize;
+		const auto dataSize = session.ReServerHostingDataSize;
 		PacketHeader* pPktHeader;
 		
 		while ((dataSize - readPos) >= PACKET_HEADER_SIZE)
@@ -440,7 +476,7 @@ namespace NetworkLib
 			readPos += pPktHeader->BodySize;
 		}
 		
-		session.RemainingDataSize -= readPos;
+		session.ReServerHostingDataSize -= readPos;
 		session.PrevReadPosInRecvBuffer = readPos;
 		
 		return NET_ERROR_CODE::NONE;
@@ -454,6 +490,7 @@ namespace NetworkLib
 		packetInfo.PacketBodySize = bodySize;
 		packetInfo.pRefData = pDataPos;
 
+		std::lock_guard<std::mutex> _queueLock(_queueMutex);
 		_packetQueue.push_back(packetInfo);
 	}
 

@@ -1,23 +1,24 @@
 #pragma once
 
-#define FD_SETSIZE 5096 // http://blog.naver.com/znfgkro1/220175848048
+#define FD_SETSIZE 5096 
 
 #pragma comment(lib, "ws2_32")
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <Windows.h>
 
 #include <vector>
 #include <deque>
 #include <unordered_map>
-//#include "ServerNetErrorCode.h"
-//#include "Define.h"
+#include <thread>
+#include <mutex>
+#include <functional>
+
 #include "ITcpNetwork.h"
 
 
 namespace NetworkLib
 {
-	//class ILog;
-
 	class TcpNetwork : public ITcpNetwork
 	{
 	public:
@@ -37,7 +38,8 @@ namespace NetworkLib
 		int ClientSessionPoolSize() override { return (int)_clientSessionPool.size(); }
 
 		void ForcingClose(const int sessionIndex);
-
+		
+		void RegistEventHandle(HANDLE* eventHandle);
 
 	protected:
 
@@ -80,7 +82,11 @@ namespace NetworkLib
 		std::vector<ClientSession> _clientSessionPool;
 		std::deque<int> _clientSessionPoolIndex;
 		
+		bool _isNetworkRunning = false;
+		std::thread _runningThread;
+		std::mutex _queueMutex;
 		std::deque<RecvPacketInfo> _packetQueue;
+		HANDLE* _processEvent = nullptr;
 
 		ILog* _refLogger;
 	};

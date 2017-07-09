@@ -8,23 +8,23 @@
 #include "LobbyManager.h"
 #include "PacketProcess.h"
 #include "UserManager.h"
-#include "Main.h"
+#include "ServerHost.h"
 
 using LOG_TYPE = NetworkLib::LOG_TYPE;
 using NET_ERROR_CODE = NetworkLib::NET_ERROR_CODE;
 
 namespace LogicLib
 {
-	Main::Main()
+	ServerHost::ServerHost()
 	{
 	}
 
-	Main::~Main()
+	ServerHost::~ServerHost()
 	{
 		release();
 	}
 
-	ERROR_CODE Main::Init()
+	ERROR_CODE ServerHost::Init()
 	{
 		_logger = std::make_unique<ConsoleLog>();
 
@@ -36,9 +36,8 @@ namespace LogicLib
 		if (result != NET_ERROR_CODE::NONE)
 		{
 			_logger->Write(LOG_TYPE::L_ERROR, "%s | Init Fail. NetErrorCode(%s)", __FUNCTION__, (short)result);
-			return ERROR_CODE::MAIN_INIT_NETWORK_INIT_FAIL;
+			return ERROR_CODE::ServerHost_INIT_NETWORK_INIT_FAIL;
 		}
-
 		
 		_userMgr = std::make_unique<UserManager>();
 		_userMgr->Init(_serverConfig->MaxClientCount);
@@ -59,26 +58,26 @@ namespace LogicLib
 		return ERROR_CODE::NONE;
 	}
 
-	void Main::release() 
+	void ServerHost::release() 
 	{
 		if (_network) {
 			_network->Release();
 		}
 	}
 
-	void Main::Stop()
+	void ServerHost::Stop()
 	{
 		_isRun = false;
 	}
 
-	void Main::Run()
+	void ServerHost::Run()
 	{
 		while (_isRun)
 		{
-			_network->Run();
-
 			while (true)
-			{				
+			{
+				WaitForSingleObject(_processEvent, INFINITE);
+
 				auto packetInfo = _network->GetPacketInfo();
 
 				if (packetInfo.PacketId == 0)
@@ -89,13 +88,15 @@ namespace LogicLib
 				{
 					_packetProc->Process(packetInfo);
 				}
+
+				ResetEvent(_processEvent);
 			}
 
 			_packetProc->StateCheck();
 		}
 	}
 
-	ERROR_CODE Main::loadConfig()
+	ERROR_CODE ServerHost::loadConfig()
 	{
 		_serverConfig = std::make_unique<NetworkLib::ServerConfig>();
 		

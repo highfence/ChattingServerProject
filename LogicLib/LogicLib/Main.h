@@ -1,15 +1,13 @@
 #pragma once
 #include <memory>
-
-#include "../Common/Packet.h"
-#include "../Common/ErrorCode.h"
+#include "../../Common/ErrorCode.h"
 
 using ERROR_CODE = NCommon::ERROR_CODE;
 
 namespace NetworkLib
 {
 	struct ServerConfig;
-	class ILog;
+	class Logger;
 	class ITcpNetwork;
 }
 
@@ -19,12 +17,11 @@ namespace LogicLib
 	class LobbyManager;
 	class PacketProcess;
 
-	class ServerHost
+	class Main
 	{
-	public:
-
-		ServerHost();
-		~ServerHost();
+	public :
+		Main();
+		~Main();
 
 		ERROR_CODE Init();
 
@@ -32,23 +29,22 @@ namespace LogicLib
 
 		void Stop();
 
-	private:
+	private :
 
 		ERROR_CODE loadConfig();
 
 		void release();
 
-	private:
-
+	private :
 		bool _isRun = false;
 
 		std::unique_ptr<NetworkLib::ServerConfig> _serverConfig;
-		std::unique_ptr<NetworkLib::ILog> _logger;
+		std::unique_ptr<NetworkLib::Logger> _logger;
 
 		std::unique_ptr<NetworkLib::ITcpNetwork> _network;
-		std::unique_ptr<PacketProcess> _packetProc;
-		std::unique_ptr<UserManager> _userMgr;
-		std::unique_ptr<LobbyManager> _lobbyMgr;
-		
+		std::unique_ptr<UserManager> _userManager;
+		std::unique_ptr<LobbyManager> _lobbyManager;
+		std::unique_ptr<PacketProcess> _packetProcess;
 	};
+
 }

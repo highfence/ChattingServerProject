@@ -1,20 +1,20 @@
 #include <iostream>
 #include <thread>
-#include "../../LogicLib/Main.h"
+#include "../../LogicLib/ServerHost.h"
 
 int main()
 {
-	LogicLib::Main main;
-	main.Init();
+	LogicLib::ServerHost ServerHost;
+	ServerHost.Init();
 
 	std::thread logicThread([&]() { 		
-		main.Run(); }
+		ServerHost.Run(); }
 	);
 	
 	std::cout << "press any key to exit...";
 	getchar();
 
-	main.Stop();
+	ServerHost.Stop();
 	logicThread.join();
 
 	return 0;

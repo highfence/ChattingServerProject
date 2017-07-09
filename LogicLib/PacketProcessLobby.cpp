@@ -30,8 +30,8 @@ namespace LogicLib
 
 		auto pUser = std::get<1>(pUserRet);
 
-		if (pUser->IsCurDomainInLogIn() == false) {
-			CHECK_ERROR(ERROR_CODE::LOBBY_ENTER_INVALID_DOMAIN);
+		if (pUser->IsCurDoServerHostInLogIn() == false) {
+			CHECK_ERROR(ERROR_CODE::LOBBY_ENTER_INVALID_DOServerHost);
 		}
 
 		auto pLobby = _refLobbyMgr->GetLobby(reqPkt->LobbyId);
@@ -72,8 +72,8 @@ namespace LogicLib
 
 		auto pUser = std::get<1>(pUserRet);
 
-		if (pUser->IsCurDomainInLobby() == false) {
-			CHECK_ERROR(ERROR_CODE::LOBBY_ROOM_LIST_INVALID_DOMAIN);
+		if (pUser->IsCurDoServerHostInLobby() == false) {
+			CHECK_ERROR(ERROR_CODE::LOBBY_ROOM_LIST_INVALID_DOServerHost);
 		}
 
 		auto pLobby = _refLobbyMgr->GetLobby(pUser->GetLobbyIndex());
@@ -108,8 +108,8 @@ namespace LogicLib
 
 		auto pUser = std::get<1>(pUserRet);
 
-		if (pUser->IsCurDomainInLobby() == false) {
-			CHECK_ERROR(ERROR_CODE::LOBBY_USER_LIST_INVALID_DOMAIN);
+		if (pUser->IsCurDoServerHostInLobby() == false) {
+			CHECK_ERROR(ERROR_CODE::LOBBY_USER_LIST_INVALID_DOServerHost);
 		}
 
 		auto pLobby = _refLobbyMgr->GetLobby(pUser->GetLobbyIndex());
@@ -147,8 +147,8 @@ namespace LogicLib
 
 		auto pUser = std::get<1>(pUserRet);
 
-		if (pUser->IsCurDomainInLobby() == false) {
-			CHECK_ERROR(ERROR_CODE::LOBBY_LEAVE_INVALID_DOMAIN);
+		if (pUser->IsCurDoServerHostInLobby() == false) {
+			CHECK_ERROR(ERROR_CODE::LOBBY_LEAVE_INVALID_DOServerHost);
 		}
 
 		auto pLobby = _refLobbyMgr->GetLobby(pUser->GetLobbyIndex());
@@ -187,8 +187,8 @@ namespace LogicLib
 
 		auto pUser = std::get<1>(pUserRet);
 
-		if (pUser->IsCurDomainInLobby() == false) {
-			CHECK_ERROR(ERROR_CODE::LOBBY_CHAT_INVALID_DOMAIN);
+		if (pUser->IsCurDoServerHostInLobby() == false) {
+			CHECK_ERROR(ERROR_CODE::LOBBY_CHAT_INVALID_DOServerHost);
 		}
 
 		auto lobbyIndex = pUser->GetLobbyIndex();

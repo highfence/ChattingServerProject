@@ -24,7 +24,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Lobby.h" />
     <ClInclude Include="LobbyManager.h" />
-    <ClInclude Include="Main.h" />
+    <ClInclude Include="ServerHost.h" />
     <ClInclude Include="PacketProcess.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="User.h" />
@@ -34,7 +34,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Lobby.cpp" />
     <ClCompile Include="LobbyManager.cpp" />
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ServerHost.cpp" />
     <ClCompile Include="PacketProcess.cpp" />
     <ClCompile Include="PacketProcessLobby.cpp" />
     <ClCompile Include="PacketProcessLogin.cpp" />
@@ -121,7 +121,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>

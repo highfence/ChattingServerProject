@@ -28,8 +28,8 @@ namespace LogicLib
 
 		auto pUser = std::get<1>(pUserRet);
 
-		if (pUser->IsCurDomainInLobby() == false) {
-			CHECK_ERROR(ERROR_CODE::ROOM_ENTER_INVALID_DOMAIN);
+		if (pUser->IsCurDoServerHostInLobby() == false) {
+			CHECK_ERROR(ERROR_CODE::ROOM_ENTER_INVALID_DOServerHost);
 		}
 
 		auto lobbyIndex = pUser->GetLobbyIndex();
@@ -103,8 +103,8 @@ namespace LogicLib
 		auto pUser = std::get<1>(pUserRet);
 		auto userIndex = pUser->GetIndex();
 
-		if (pUser->IsCurDomainInRoom() == false) {
-			CHECK_ERROR(ERROR_CODE::ROOM_LEAVE_INVALID_DOMAIN);
+		if (pUser->IsCurDoServerHostInRoom() == false) {
+			CHECK_ERROR(ERROR_CODE::ROOM_LEAVE_INVALID_DOServerHost);
 		}
 
 		auto lobbyIndex = pUser->GetLobbyIndex();
@@ -159,8 +159,8 @@ namespace LogicLib
 
 		auto pUser = std::get<1>(pUserRet);
 		
-		if (pUser->IsCurDomainInRoom() == false) {
-			CHECK_ERROR(ERROR_CODE::ROOM_CHAT_INVALID_DOMAIN);
+		if (pUser->IsCurDoServerHostInRoom() == false) {
+			CHECK_ERROR(ERROR_CODE::ROOM_CHAT_INVALID_DOServerHost);
 		}
 
 		auto lobbyIndex = pUser->GetLobbyIndex();
@@ -199,8 +199,8 @@ namespace LogicLib
 
 		auto pUser = std::get<1>(pUserRet);
 
-		if (pUser->IsCurDomainInRoom() == false) {
-			CHECK_ERROR(ERROR_CODE::ROOM_MASTER_GAME_START_INVALID_DOMAIN);
+		if (pUser->IsCurDoServerHostInRoom() == false) {
+			CHECK_ERROR(ERROR_CODE::ROOM_MASTER_GAME_START_INVALID_DOServerHost);
 		}
 
 		auto lobbyIndex = pUser->GetLobbyIndex();
@@ -264,8 +264,8 @@ namespace LogicLib
 
 		auto pUser = std::get<1>(pUserRet);
 
-		if (pUser->IsCurDomainInRoom() == false) {
-			CHECK_ERROR(ERROR_CODE::ROOM_MASTER_GAME_START_INVALID_DOMAIN);
+		if (pUser->IsCurDoServerHostInRoom() == false) {
+			CHECK_ERROR(ERROR_CODE::ROOM_MASTER_GAME_START_INVALID_DOServerHost);
 		}
 
 		auto lobbyIndex = pUser->GetLobbyIndex();

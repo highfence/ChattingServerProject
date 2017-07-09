@@ -6,7 +6,7 @@ namespace LogicLib
 	class User
 	{
 	public :
-		enum class DOMAIN_STATE {
+		enum class DOServerHost_STATE {
 			NONE = 0,
 			LOGIN = 1,
 			LOBBY = 2,
@@ -27,7 +27,7 @@ namespace LogicLib
 			_sessionIndex = 0;
 			_id = "";
 			_isConfirm = false;
-			_curDomainState = DOMAIN_STATE::NONE;
+			_curDoServerHostState = DOServerHost_STATE::NONE;
 			_lobbyIndex = -1;
 			_roomIndex = -1;
 		}
@@ -35,7 +35,7 @@ namespace LogicLib
 		void Set(const int sessionIndex, const char* pszID)
 		{
 			_isConfirm = true;
-			_curDomainState = DOMAIN_STATE::LOGIN;
+			_curDoServerHostState = DOServerHost_STATE::LOGIN;
 
 			_sessionIndex = sessionIndex;
 			_id = pszID;
@@ -55,12 +55,12 @@ namespace LogicLib
 		void EnterLobby(const short lobbyIndex)
 		{
 			_lobbyIndex = lobbyIndex;
-			_curDomainState = DOMAIN_STATE::LOBBY;
+			_curDoServerHostState = DOServerHost_STATE::LOBBY;
 		}
 		
 		void LeaveLobby()
 		{
-			_curDomainState = DOMAIN_STATE::LOGIN;
+			_curDoServerHostState = DOServerHost_STATE::LOGIN;
 		}
 
 		
@@ -70,19 +70,19 @@ namespace LogicLib
 		{
 			_lobbyIndex = lobbyIndex;
 			_roomIndex = roomIndex;
-			_curDomainState = DOMAIN_STATE::ROOM;
+			_curDoServerHostState = DOServerHost_STATE::ROOM;
 		}
 
-		bool IsCurDomainInLogIn() {
-			return _curDomainState == DOMAIN_STATE::LOGIN ? true : false;
+		bool IsCurDoServerHostInLogIn() {
+			return _curDoServerHostState == DOServerHost_STATE::LOGIN ? true : false;
 		}
 		
-		bool IsCurDomainInLobby() {
-			return _curDomainState == DOMAIN_STATE::LOBBY ? true : false;
+		bool IsCurDoServerHostInLobby() {
+			return _curDoServerHostState == DOServerHost_STATE::LOBBY ? true : false;
 		}
 
-		bool IsCurDomainInRoom() {
-			return _curDomainState == DOMAIN_STATE::ROOM ? true : false;
+		bool IsCurDoServerHostInRoom() {
+			return _curDoServerHostState == DOServerHost_STATE::ROOM ? true : false;
 		}
 
 		
@@ -95,7 +95,7 @@ namespace LogicLib
 		
 		bool _isConfirm = false;
 		
-		DOMAIN_STATE _curDomainState = DOMAIN_STATE::NONE;
+		DOServerHost_STATE _curDoServerHostState = DOServerHost_STATE::NONE;
 
 		short _lobbyIndex = -1;
 
