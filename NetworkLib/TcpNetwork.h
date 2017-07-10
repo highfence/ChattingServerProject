@@ -41,6 +41,8 @@ namespace NetworkLib
 		
 		void RegistEventHandle(HANDLE* eventHandle);
 
+		bool IsPacketTaskRemaining();
+
 	protected:
 
 		NET_ERROR_CODE initServerSocket();

@@ -76,8 +76,6 @@ namespace LogicLib
 		{
 			while (true)
 			{
-				WaitForSingleObject(_processEvent, INFINITE);
-
 				auto packetInfo = _network->GetPacketInfo();
 
 				if (packetInfo.PacketId == 0)
@@ -89,6 +87,12 @@ namespace LogicLib
 					_packetProc->Process(packetInfo);
 				}
 
+				if (_network->IsPacketTaskRemaining())
+				{
+					continue;
+				}
+
+				WaitForSingleObject(_processEvent, 1);
 				ResetEvent(_processEvent);
 			}
 

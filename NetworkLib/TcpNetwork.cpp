@@ -107,6 +107,17 @@ namespace NetworkLib
 		_processEvent = eventHandle;
 	}
 
+	bool TcpNetwork::IsPacketTaskRemaining()
+	{
+		std::lock_guard<std::mutex> lock(_queueMutex);
+		if (_packetQueue.empty())
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	void TcpNetwork::Run()
 	{
 		while (_isNetworkRunning)
