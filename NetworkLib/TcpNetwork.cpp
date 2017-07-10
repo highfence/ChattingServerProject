@@ -70,6 +70,8 @@ namespace NetworkLib
 
 	void TcpNetwork::Release()
 	{
+		_isNetworkRunning = false;
+		_runningThread.join();
 		WSACleanup();
 	}
 

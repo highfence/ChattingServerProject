@@ -28,7 +28,7 @@ namespace NetworkLib
 
 		virtual void ForcingClose(const int sessionIndex) {}
 
-		virtual bool IsPacketTaskRemaining() {};
+		virtual bool IsPacketTaskRemaining() { return true; };
 
 	};
 }
