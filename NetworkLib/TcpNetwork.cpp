@@ -5,6 +5,7 @@
 #include <mutex>
 #include <functional>
 
+#include "../Common/ObjectPool.h"
 #include "ILog.h"
 #include "TcpNetwork.h"
 
@@ -15,16 +16,6 @@ namespace NetworkLib
 	
 	TcpNetwork::~TcpNetwork() 
 	{
-		for (auto& client : _clientSessionPool)
-		{
-			if (client.pRecvBuffer) {
-				delete[] client.pRecvBuffer;
-			}
-			
-			if (client.pSendBuffer) {
-				delete[] client.pSendBuffer;
-			}
-		}
 	}
 
 	NET_ERROR_CODE TcpNetwork::Init(const ServerConfig* pConfig, ILog* pLogger)
@@ -59,7 +50,8 @@ namespace NetworkLib
 		FD_ZERO(&_readfds);
 		FD_SET(_serverSockfd, &_readfds);
 		
-		auto sessionPoolSize = createSessionPool(pConfig->MaxClientCount + pConfig->ExtraClientCount);
+		auto sessionPoolSize = pConfig->MaxClientCount + pConfig->ExtraClientCount;
+		_clientSessionPool.Init(sessionPoolSize);
 			
 		_refLogger->Write(LOG_TYPE::L_INFO, "%s | Session Pool Size: %d", __FUNCTION__, sessionPoolSize);
 
@@ -72,6 +64,7 @@ namespace NetworkLib
 	{
 		_isNetworkRunning = false;
 		_runningThread.join();
+		_clientSessionPool.Release();
 		WSACleanup();
 	}
 
@@ -92,7 +85,8 @@ namespace NetworkLib
 		
 	void TcpNetwork::ForcingClose(const int sessionIndex)
 	{
-		if (_clientSessionPool[sessionIndex].IsConnected() == false) {
+		if (_clientSessionPool[sessionIndex].IsConnected() == false)
+		{
 			return;
 		}
 
@@ -168,7 +162,7 @@ namespace NetworkLib
 	
 	void TcpNetwork::runCheckSelectClients(fd_set& read_set, fd_set& write_set)
 	{
-		for (unsigned int i = 0; i < _clientSessionPool.size(); ++i)
+		for (unsigned int i = 0; i < _clientSessionPool.GetSize(); ++i)
 		{
 			auto& session = _clientSessionPool[i];
 
@@ -230,40 +224,6 @@ namespace NetworkLib
 		session.SendSize += (size + PACKET_HEADER_SIZE);
 
 		return NET_ERROR_CODE::NONE;
-	}
-
-	int TcpNetwork::createSessionPool(const int maxClientCount)
-	{
-		for (int i = 0; i < maxClientCount; ++i)
-		{
-			ClientSession session;
-			ZeroMemory(&session, sizeof(session));
-			session.Index = i;
-			session.pRecvBuffer = new char[_config.MaxClientRecvBufferSize];
-			session.pSendBuffer = new char[_config.MaxClientSendBufferSize];
-			
-			_clientSessionPool.push_back(session);
-			_clientSessionPoolIndex.push_back(session.Index);			
-		}
-
-		return maxClientCount;
-	}
-
-	int TcpNetwork::allocClientSessionIndex()
-	{
-		if (_clientSessionPoolIndex.empty()) {
-			return -1;
-		}
-
-		int index = _clientSessionPoolIndex.front();
-		_clientSessionPoolIndex.pop_front();
-		return index;
-	}
-
-	void TcpNetwork::releaseSessionIndex(const int index)
-	{
-		_clientSessionPoolIndex.push_back(index);
-		_clientSessionPool[index].Clear();
 	}
 
 	NET_ERROR_CODE TcpNetwork::initServerSocket()
@@ -338,7 +298,7 @@ namespace NetworkLib
 				return NET_ERROR_CODE::ACCEPT_API_ERROR;
 			}
 
-			auto newSessionIndex = allocClientSessionIndex();
+			auto newSessionIndex = _clientSessionPool.GetTag();
 			if (newSessionIndex < 0)
 			{
 				_refLogger->Write(LOG_TYPE::L_WARN, "%s | client_sockfd(%I64u)  >= MAX_SESSION", __FUNCTION__, client_sockfd);
@@ -410,7 +370,7 @@ namespace NetworkLib
 
 		_clientSessionPool[sessionIndex].Clear();
 		--_connectedSessionCount;
-		releaseSessionIndex(sessionIndex);
+		_clientSessionPool.ReleaseTag(sessionIndex);
 
 		addPacketQueue(sessionIndex, (short)PACKET_ID::NTF_SYS_CLOSE_SESSION, 0, nullptr);
 	}

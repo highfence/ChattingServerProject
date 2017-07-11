@@ -14,6 +14,7 @@
 #include <mutex>
 #include <functional>
 
+#include "../Common/ObjectPool.h"
 #include "ITcpNetwork.h"
 
 
@@ -35,7 +36,7 @@ namespace NetworkLib
 
 		void Release() override;
 
-		int ClientSessionPoolSize() override { return (int)_clientSessionPool.size(); }
+		int ClientSessionPoolSize() override { return (int)_clientSessionPool.GetSize(); }
 
 		void ForcingClose(const int sessionIndex);
 		
@@ -48,10 +49,6 @@ namespace NetworkLib
 		NET_ERROR_CODE initServerSocket();
 		NET_ERROR_CODE bindListen(short port, int backlogCount);
 		
-		int allocClientSessionIndex();
-		void releaseSessionIndex(const int index);
-
-		int createSessionPool(const int maxClientCount);
 		NET_ERROR_CODE newSession();
 		void setSockOption(const SOCKET fd);
 		void connectedSession(const int sessionIndex, const SOCKET fd, const char* pIP);
@@ -81,8 +78,7 @@ namespace NetworkLib
 		
 		int64_t						_connectSeq = 0;
 		
-		std::vector<ClientSession> _clientSessionPool;
-		std::deque<int>            _clientSessionPoolIndex;
+		NCommon::ObjectPool<ClientSession> _clientSessionPool;
 		
 		bool	                   _isNetworkRunning = false;
 		std::thread                _runningThread;

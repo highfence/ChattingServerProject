@@ -133,7 +133,6 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Lobby.h" />
     <ClInclude Include="LobbyManager.h" />
-    <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="PacketProcess.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="ServerHost.h" />

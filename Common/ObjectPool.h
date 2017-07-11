@@ -5,29 +5,34 @@
 #include <mutex>
 
 
-namespace LogicLib
+namespace NCommon
 {
 	template<class T>
 	class ObjectPool
 	{
 	public :
-		ObjectPool(const int poolSize);
 
-		~ObjectPool();
+		ObjectPool() {};
+		~ObjectPool() {};
+
+		void Init(const int poolSize);
+		void Release();
 
 		int GetTag();
 
 		void ReleaseTag(const int tag);
 
-		T* begin();
-		T* end();
+		int GetSize();
+		bool IsEmpty();
 
-		T* operator[](const int idx);
+		T& begin();
+		T& end();
+		T& operator[](const int idx);
 
 	private :
 
 		std::mutex _poolMutex;
-		std::vector<T*> _pool;
+		std::vector<std::unique_ptr<T>> _pool;
 
 		std::mutex _poolIndexMutex;
 		std::deque<int> _poolIndex;
@@ -37,20 +42,19 @@ namespace LogicLib
 	};
 
 	template<class T>
-	inline ObjectPool<T>::ObjectPool(const int poolSize)
+	inline void ObjectPool<T>::Init(const int poolSize)
 	{
-		_pool.reserve(poolsize);
-		_poolIndex.reserve(poolSize);
+		_pool.reserve(poolSize);
 
 		for (int i = 0; i < poolSize; ++i)
 		{
-			_pool.emplace(new T());
+			_pool.emplace_back(std::make_unique<T>());
 			_poolIndex.push_back(i);
 		}
 	}
 
 	template<class T>
-	inline ObjectPool<T>::~ObjectPool()
+	inline void ObjectPool<T>::Release()
 	{
 		_pool.clear();
 		_pool.shrink_to_fit();
@@ -81,23 +85,37 @@ namespace LogicLib
 	}
 
 	template<class T>
-	inline T * ObjectPool<T>::begin()
+	inline int ObjectPool<T>::GetSize()
 	{
 		std::lock_guard<std::mutex> _poolLock(_poolMutex);
-		return &_pool.begin();
+		return _pool.size();
 	}
 
 	template<class T>
-	inline T * ObjectPool<T>::end()
+	inline T & ObjectPool<T>::begin()
 	{
 		std::lock_guard<std::mutex> _poolLock(_poolMutex);
-		return &_pool.end();
+		return _pool.begin();
 	}
 
 	template<class T>
-	inline T * ObjectPool<T>::operator[](const int idx)
+	inline T & ObjectPool<T>::end()
 	{
 		std::lock_guard<std::mutex> _poolLock(_poolMutex);
-		return &_pool[idx];
+		return _pool.end();
+	}
+
+	template<class T>
+	inline T & ObjectPool<T>::operator[](const int idx)
+	{
+		std::lock_guard<std::mutex> _poolLock(_poolMutex);
+		return *_pool[idx];
+	}
+
+	template<class T>
+	inline bool ObjectPool<T>::IsEmpty()
+	{
+		std::lock_guard<std::mutex> _poolLock(_poolMutex);
+		return _pool.empty();
 	}
 }

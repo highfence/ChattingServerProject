@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{91B9FD
 	ProjectSection(SolutionItems) = preProject
 		Common\conmanip.h = Common\conmanip.h
 		Common\ErrorCode.h = Common\ErrorCode.h
+		Common\ObjectPool.h = Common\ObjectPool.h
 		Common\Packet.h = Common\Packet.h
 		Common\PacketID.h = Common\PacketID.h
 	EndProjectSection
