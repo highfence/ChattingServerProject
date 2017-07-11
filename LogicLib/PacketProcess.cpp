@@ -50,8 +50,7 @@ namespace LogicLib
 		PacketFuncArray[(int)commonPacketId::ROOM_CHAT_REQ] = &PacketProcess::roomChat;
 		PacketFuncArray[(int)commonPacketId::ROOM_MASTER_GAME_START_REQ] = &PacketProcess::roomMasterGameStart;
 		PacketFuncArray[(int)commonPacketId::ROOM_GAME_START_REQ] = &PacketProcess::roomGameStart;
-
-
+		PacketFuncArray[(int)commonPacketId::LOBBY_WISPER_REQ] = &PacketProcess::lobbyWisper;
 
 		PacketFuncArray[(int)commonPacketId::DEV_ECHO_REQ] = &PacketProcess::devEcho;
 	}

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <thread>
-#include "../../LogicLib/ServerHost.h"
+#include "../LogicLib/ServerHost.h"
 
 int main()
 {

@@ -82,8 +82,7 @@ namespace NetworkLib
 		int64_t						_connectSeq = 0;
 		
 		std::vector<ClientSession> _clientSessionPool;
-		std::deque<int>            
-			_clientSessionPoolIndex;
+		std::deque<int>            _clientSessionPoolIndex;
 		
 		bool	                   _isNetworkRunning = false;
 		std::thread                _runningThread;

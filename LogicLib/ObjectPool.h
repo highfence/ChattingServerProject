@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include <deque>
+#include <mutex>
 
 
 namespace LogicLib
@@ -11,20 +12,26 @@ namespace LogicLib
 	{
 	public :
 		ObjectPool(const int poolSize);
+
 		~ObjectPool();
 
 		int GetTag();
+
 		void ReleaseTag(const int tag);
 
-		// Like stl containers...
-		bool empty() const { return _pool.empty(); }
-		size_t size() const { return _pool.size(); }
-		int objNumber() const { return _activatedObjects; }
-		T& at(const int tag) const { return &_pool.at(tag); }
+		T* begin();
+		T* end();
+
+		T* operator[](const int idx);
 
 	private :
-		std::vector<T> _pool;
+
+		std::mutex _poolMutex;
+		std::vector<T*> _pool;
+
+		std::mutex _poolIndexMutex;
 		std::deque<int> _poolIndex;
+
 		int _activatedObjects = 0;
 
 	};
@@ -54,6 +61,7 @@ namespace LogicLib
 	template<class T>
 	inline int ObjectPool<T>::GetTag()
 	{
+		std::lock_guard<std::mutex> _idxLock(_poolIndexMutex);
 		if (_poolIndex.empty())
 		{
 			return -1;
@@ -68,6 +76,28 @@ namespace LogicLib
 	template<class T>
 	inline void ObjectPool<T>::ReleaseTag(const int tag)
 	{
+		std::lock_guard<std::mutex> _idxLock(_poolIndexMutex);
 		_poolIndex.push_back(tag);
+	}
+
+	template<class T>
+	inline T * ObjectPool<T>::begin()
+	{
+		std::lock_guard<std::mutex> _poolLock(_poolMutex);
+		return &_pool.begin();
+	}
+
+	template<class T>
+	inline T * ObjectPool<T>::end()
+	{
+		std::lock_guard<std::mutex> _poolLock(_poolMutex);
+		return &_pool.end();
+	}
+
+	template<class T>
+	inline T * ObjectPool<T>::operator[](const int idx)
+	{
+		std::lock_guard<std::mutex> _poolLock(_poolMutex);
+		return &_pool[idx];
 	}
 }

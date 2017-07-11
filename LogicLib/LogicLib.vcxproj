@@ -18,34 +18,9 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="ConnectedUserManager.h" />
-    <ClInclude Include="ConsoleLogger.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="Lobby.h" />
-    <ClInclude Include="LobbyManager.h" />
-    <ClInclude Include="ObjectPool.h" />
-    <ClInclude Include="ServerHost.h" />
-    <ClInclude Include="PacketProcess.h" />
-    <ClInclude Include="Room.h" />
-    <ClInclude Include="User.h" />
-    <ClInclude Include="UserManager.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="Lobby.cpp" />
-    <ClCompile Include="LobbyManager.cpp" />
-    <ClCompile Include="ServerHost.cpp" />
-    <ClCompile Include="PacketProcess.cpp" />
-    <ClCompile Include="PacketProcessLobby.cpp" />
-    <ClCompile Include="PacketProcessLogin.cpp" />
-    <ClCompile Include="PacketProcessRoom.cpp" />
-    <ClCompile Include="Room.cpp" />
-    <ClCompile Include="UserManager.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{A09BB0D3-2E91-4286-978A-70D32CE58E83}</ProjectGuid>
+    <ProjectGuid>{7D47E714-7D43-4B44-A713-616683605E54}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>LogicLib</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
@@ -152,6 +127,31 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="ConnectedUserManager.h" />
+    <ClInclude Include="ConsoleLogger.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="Lobby.h" />
+    <ClInclude Include="LobbyManager.h" />
+    <ClInclude Include="ObjectPool.h" />
+    <ClInclude Include="PacketProcess.h" />
+    <ClInclude Include="Room.h" />
+    <ClInclude Include="ServerHost.h" />
+    <ClInclude Include="User.h" />
+    <ClInclude Include="UserManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Lobby.cpp" />
+    <ClCompile Include="LobbyManager.cpp" />
+    <ClCompile Include="PacketProcess.cpp" />
+    <ClCompile Include="PacketProcessLobby.cpp" />
+    <ClCompile Include="PacketProcessLogin.cpp" />
+    <ClCompile Include="PacketProcessRoom.cpp" />
+    <ClCompile Include="Room.cpp" />
+    <ClCompile Include="ServerHost.cpp" />
+    <ClCompile Include="UserManager.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
