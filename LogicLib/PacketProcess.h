@@ -54,7 +54,7 @@ namespace LogicLib
 		std::unique_ptr<ConnectedUserManager> _connectedUserManager;
 						
 	private:
-		ERROR_CODE ntfSysConnctSession(PacketInfo packetInfo);
+		ERROR_CODE ntfSysConnectSession(PacketInfo packetInfo);
 		ERROR_CODE ntfSysCloseSession(PacketInfo packetInfo);
 		
 		ERROR_CODE login(PacketInfo packetInfo);
@@ -68,6 +68,8 @@ namespace LogicLib
 		ERROR_CODE lobbyUserList(PacketInfo packetInfo);
 
 		ERROR_CODE lobbyChat(PacketInfo packetInfo);
+
+		ERROR_CODE lobbyWisper(PacketInfo packetInfo);
 
 		ERROR_CODE lobbyLeave(PacketInfo packetInfo);
 

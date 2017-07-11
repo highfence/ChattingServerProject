@@ -86,6 +86,7 @@ namespace LogicLib
 		pLobby->SendRoomList(pUser->GetSessioIndex(), reqPkt->StartRoomIndex);
 
 		return ERROR_CODE::NONE;
+
 	CHECK_ERR :
 		NCommon::PktLobbyRoomListRes resPkt;
 		resPkt.SetError(__result);
@@ -205,6 +206,46 @@ namespace LogicLib
 	CHECK_ERR:
 		resPkt.SetError(__result);
 		_refNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::LOBBY_CHAT_RES, sizeof(resPkt), (char*)&resPkt);
+		return __result;
+	}
+
+	ERROR_CODE PacketProcess::lobbyWisper(PacketInfo packetInfo)
+	{
+		CHECK_START
+			auto reqPkt = reinterpret_cast<NCommon::PktLobbyWisperReq*>(packetInfo.pRefData);
+			NCommon::PktLobbyWisperRes resPkt;
+
+			auto pUserRet = _refUserMgr->GetUser(packetInfo.SessionIndex);
+			auto errorCode = std::get<0>(pUserRet);
+
+			if (errorCode != ERROR_CODE::NONE)
+			{
+				CHECK_ERROR(errorCode);
+			}
+
+			auto pUser = std::get<1>(pUserRet);
+
+			if (pUser->IsCurDoServerHostInLobby() == false)
+			{
+				CHECK_ERROR(ERROR_CODE::LOBBY_CHAT_INVALID_DOServerHost);
+			}
+
+			auto lobbyIndex = pUser->GetLobbyIndex();
+			auto pLobby = _refLobbyMgr->GetLobby(lobbyIndex);
+			if (pLobby == nullptr)
+			{
+				CHECK_ERROR(ERROR_CODE::LOBBY_CHAT_INVALID_LOBBY_INDEX);
+			}
+
+			pLobby->NotifyWisper(reqPkt->SrcUserID, reqPkt->Msg, reqPkt->DestUserID);
+
+			_refNetwork->SendData(packetInfo.SessionIndex, static_cast<short>(PACKET_ID::LOBBY_WISPER_RES), sizeof(resPkt), (char*)&resPkt);
+
+		return ERROR_CODE::NONE;
+
+	CHECK_ERR:
+		resPkt.SetError(__result);
+		_refNetwork->SendData(packetInfo.SessionIndex, (short)PACKET_ID::LOBBY_WISPER_RES, sizeof(resPkt), (char*)&resPkt);
 		return __result;
 	}
 }

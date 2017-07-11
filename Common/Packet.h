@@ -198,6 +198,25 @@ namespace NCommon
 		wchar_t Msg[MAX_LOBBY_CHAT_MSG_SIZE + 1] = { 0, };
 	};
 
+	// 로비 귓속말.
+	struct PktLobbyWisperReq
+	{
+		char SrcUserID[MAX_USER_ID_SIZE + 1] = { 0, };
+		char DestUserID[MAX_USER_ID_SIZE + 1] = { 0, };
+		wchar_t Msg[MAX_LOBBY_CHAT_MSG_SIZE + 1] = { 0, };
+	};
+
+	struct PktLobbyWisperRes : PktBase
+	{
+	};
+
+	struct PktLobbyWisperNtf
+	{
+		// 보낸 사람의 ID
+		char UserID[MAX_USER_ID_SIZE + 1] = { 0, };
+		wchar_t Msg[MAX_LOBBY_CHAT_MSG_SIZE + 1] = { 0, };
+	};
+
 
 	// 방장의 게임 시작 요청
 	struct PktRoomMaterGameStartReq

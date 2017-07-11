@@ -72,24 +72,25 @@ namespace NetworkLib
 		
 	protected:
 
-		ServerConfig _config;
+		ServerConfig               _config;
 				
-		SOCKET _serverSockfd;
+		SOCKET                     _serverSockfd;
 
-		fd_set _readfds;
-		size_t _connectedSessionCount = 0;
+		fd_set					   _readfds;
+		size_t					   _connectedSessionCount = 0;
 		
-		int64_t _connectSeq = 0;
+		int64_t						_connectSeq = 0;
 		
 		std::vector<ClientSession> _clientSessionPool;
-		std::deque<int> _clientSessionPoolIndex;
+		std::deque<int>            
+			_clientSessionPoolIndex;
 		
-		bool _isNetworkRunning = false;
-		std::thread _runningThread;
-		std::mutex _queueMutex;
+		bool	                   _isNetworkRunning = false;
+		std::thread                _runningThread;
+		std::mutex                 _queueMutex;
 		std::deque<RecvPacketInfo> _packetQueue;
-		HANDLE* _processEvent = nullptr;
+		HANDLE*                    _processEvent = nullptr;
 
-		ILog* _refLogger;
+		ILog*                      _refLogger;
 	};
 }

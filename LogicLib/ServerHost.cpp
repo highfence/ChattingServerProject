@@ -15,9 +15,7 @@ using NET_ERROR_CODE = NetworkLib::NET_ERROR_CODE;
 
 namespace LogicLib
 {
-	ServerHost::ServerHost()
-	{
-	}
+	ServerHost::ServerHost() {}
 
 	ServerHost::~ServerHost()
 	{
@@ -60,7 +58,8 @@ namespace LogicLib
 
 	void ServerHost::release() 
 	{
-		if (_network) {
+		if (_network) 
+		{
 			_network->Release();
 		}
 	}

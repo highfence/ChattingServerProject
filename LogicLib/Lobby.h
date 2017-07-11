@@ -76,6 +76,8 @@ namespace LogicLib
 
 		void NotifyChat(const int sessionIndex, const char* pszUserID, const wchar_t* pszMsg);
 
+		void NotifyWisper(const char* pszUserId, const wchar_t* pszMsg, const char* destUserId);
+
 	protected:
 
 		void sendToAllUser(const short packetId, const short dataSize, char* pData, const int passUserindex = -1);

@@ -36,7 +36,7 @@ namespace LogicLib
 			PacketFuncArray[i] = nullptr;
 		}
 
-		PacketFuncArray[(int)netLibPacketId::NTF_SYS_CONNECT_SESSION] = &PacketProcess::ntfSysConnctSession;
+		PacketFuncArray[(int)netLibPacketId::NTF_SYS_CONNECT_SESSION] = &PacketProcess::ntfSysConnectSession;
 		PacketFuncArray[(int)netLibPacketId::NTF_SYS_CLOSE_SESSION] = &PacketProcess::ntfSysCloseSession;
 		PacketFuncArray[(int)commonPacketId::LOGIN_IN_REQ] = &PacketProcess::login;
 		PacketFuncArray[(int)commonPacketId::LOBBY_LIST_REQ] = &PacketProcess::lobbyList;
@@ -62,7 +62,7 @@ namespace LogicLib
 		
 		if (PacketFuncArray[packetId] == nullptr)
 		{
-			//TODO: 로그 남긴다
+			// TODO :: 로그 남긴다
 			return;
 		}
 
@@ -74,7 +74,7 @@ namespace LogicLib
 		_connectedUserManager->LoginCheck();
 	}
 
-	ERROR_CODE PacketProcess::ntfSysConnctSession(PacketInfo packetInfo)
+	ERROR_CODE PacketProcess::ntfSysConnectSession(PacketInfo packetInfo)
 	{
 		_connectedUserManager->SetConnectSession(packetInfo.SessionIndex);
 		return ERROR_CODE::NONE;

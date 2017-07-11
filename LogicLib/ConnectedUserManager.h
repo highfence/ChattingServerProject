@@ -79,14 +79,16 @@ namespace LogicLib
 
 			const auto maxSessionCount = (int)_connectedUserList.size();
 
-			if (_latestLogincheckIndex >= maxSessionCount) {
+			if (_latestLogincheckIndex >= maxSessionCount) 
+			{
 				_latestLogincheckIndex = -1;
 			}
 
 			++_latestLogincheckIndex;
 
 			auto lastCheckIndex = _latestLogincheckIndex + 100;
-			if (lastCheckIndex > maxSessionCount) {
+			if (lastCheckIndex > maxSessionCount)
+			{
 				lastCheckIndex = maxSessionCount;
 			}
 

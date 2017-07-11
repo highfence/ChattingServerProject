@@ -17,10 +17,10 @@ namespace LogicLib
 		void ReleaseTag(const int tag);
 
 		// Like stl containers...
-		bool empty() const { return _pool.empty(); };
-		size_t size() const { return _pool.size(); };
-		int objNumber() const { return _activatedObjects; };
-		T* at(const int tag) const { return _pool.at(tag); };
+		bool empty() const { return _pool.empty(); }
+		size_t size() const { return _pool.size(); }
+		int objNumber() const { return _activatedObjects; }
+		T& at(const int tag) const { return &_pool.at(tag); }
 
 	private :
 		std::vector<T> _pool;

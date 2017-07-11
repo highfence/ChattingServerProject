@@ -302,4 +302,27 @@ namespace LogicLib
 
 		sendToAllUser((short)PACKET_ID::LOBBY_CHAT_NTF, sizeof(pkt), (char*)&pkt, sessionIndex);
 	}
+
+	void Lobby::NotifyWisper(const char * pszUserId, const wchar_t * pszMsg, const char * destUserId)
+	{
+		// 보낼 패킷 만들기.
+		NCommon::PktLobbyWisperNtf pkt;
+		strncpy_s(pkt.UserID, _countof(pkt.UserID), pszUserId, NCommon::MAX_USER_ID_SIZE);
+		wcsncpy_s(pkt.Msg, NCommon::MAX_LOBBY_CHAT_MSG_SIZE + 1, pszMsg, NCommon::MAX_LOBBY_CHAT_MSG_SIZE);
+
+		// 보낼 유저 찾기.
+		auto destUser = _userIDDic.find(destUserId);
+		if (destUser == _userIDDic.end())
+		{
+			OutputDebugString(L"can't find matching user id \n");
+			return;
+		}
+
+		// 만든 패킷을 보낼 유저에게 보내기.
+		_refNetwork->SendData(
+			destUser->second->GetSessioIndex(),
+			static_cast<short>(PACKET_ID::LOBBY_WISPER_NTF),
+			sizeof(pkt),
+			(char*)&pkt);
+	}
 }
