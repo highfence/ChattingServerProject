@@ -13,10 +13,8 @@
 namespace NetworkLib
 {
 	TcpNetwork::TcpNetwork() {}
-	
-	TcpNetwork::~TcpNetwork() 
-	{
-	}
+
+	TcpNetwork::~TcpNetwork() {}
 
 	NET_ERROR_CODE TcpNetwork::Init(const ServerConfig* pConfig, ILog* pLogger)
 	{
@@ -40,7 +38,7 @@ namespace NetworkLib
 		{
 			return initRet;
 		}
-		
+
 		auto bindListenRet = bindListen(pConfig->Port, pConfig->BackLogCount);
 		if (bindListenRet != NET_ERROR_CODE::NONE)
 		{
@@ -49,10 +47,10 @@ namespace NetworkLib
 
 		FD_ZERO(&_readfds);
 		FD_SET(_serverSockfd, &_readfds);
-		
+
 		auto sessionPoolSize = pConfig->MaxClientCount + pConfig->ExtraClientCount;
 		_clientSessionPool.Init(sessionPoolSize);
-			
+
 		_refLogger->Write(LOG_TYPE::L_INFO, "%s | Session Pool Size: %d", __FUNCTION__, sessionPoolSize);
 
 		startRunThread();
@@ -79,10 +77,10 @@ namespace NetworkLib
 			packetInfo = _packetQueue.front();
 			_packetQueue.pop_front();
 		}
-				
+
 		return packetInfo;
 	}
-		
+
 	void TcpNetwork::ForcingClose(const int sessionIndex)
 	{
 		if (_clientSessionPool[sessionIndex].IsConnected() == false)
@@ -159,7 +157,7 @@ namespace NetworkLib
 
 		return true;
 	}
-	
+
 	void TcpNetwork::runCheckSelectClients(fd_set& read_set, fd_set& write_set)
 	{
 		for (unsigned int i = 0; i < _clientSessionPool.GetSize(); ++i)
@@ -214,10 +212,10 @@ namespace NetworkLib
 
 		auto pos = session.SendSize;
 
-		if ((pos + size + PACKET_HEADER_SIZE) > _config.MaxClientSendBufferSize ) {
+		if ((pos + size + PACKET_HEADER_SIZE) > _config.MaxClientSendBufferSize) {
 			return NET_ERROR_CODE::CLIENT_SEND_BUFFER_FULL;
 		}
-				
+
 		PacketHeader pktHeader{ packetId, size };
 		memcpy(&session.pSendBuffer[pos], (char*)&pktHeader, PACKET_HEADER_SIZE);
 		memcpy(&session.pSendBuffer[pos + PACKET_HEADER_SIZE], pMsg, size);
@@ -259,7 +257,7 @@ namespace NetworkLib
 		{
 			return NET_ERROR_CODE::SERVER_SOCKET_BIND_FAIL;
 		}
-		
+
 		unsigned long mode = 1;
 		if (ioctlsocket(_serverSockfd, FIONBIO, &mode) == SOCKET_ERROR)
 		{
@@ -286,7 +284,7 @@ namespace NetworkLib
 			SOCKADDR_IN client_addr;
 			auto client_len = static_cast<int>(sizeof(client_addr));
 			auto client_sockfd = accept(_serverSockfd, (SOCKADDR*)&client_addr, &client_len);
-				//m_pRefLogger->Write(LOG_TYPE::L_DEBUG, "%s | client_sockfd(%I64u)", __FUNCTION__, client_sockfd);
+			//m_pRefLogger->Write(LOG_TYPE::L_DEBUG, "%s | client_sockfd(%I64u)", __FUNCTION__, client_sockfd);
 			if (client_sockfd == INVALID_SOCKET)
 			{
 				if (WSAGetLastError() == WSAEWOULDBLOCK)
@@ -315,14 +313,14 @@ namespace NetworkLib
 			setSockOption(client_sockfd);
 
 			FD_SET(client_sockfd, &_readfds);
-				_refLogger->Write(LOG_TYPE::L_DEBUG, "%s | client_sockfd(%I64u)", __FUNCTION__, client_sockfd);
+			_refLogger->Write(LOG_TYPE::L_DEBUG, "%s | client_sockfd(%I64u)", __FUNCTION__, client_sockfd);
 			connectedSession(newSessionIndex, client_sockfd, clientIP);
 
 		} while (tryCount < FD_SETSIZE);
-		
+
 		return NET_ERROR_CODE::NONE;
 	}
-	
+
 	void TcpNetwork::connectedSession(const int sessionIndex, const SOCKET fd, const char* pIP)
 	{
 		++_connectSeq;
@@ -386,7 +384,7 @@ namespace NetworkLib
 		}
 
 		int recvPos = 0;
-				
+
 		if (session.ReServerHostingDataSize > 0)
 		{
 			memcpy(session.pRecvBuffer, &session.pRecvBuffer[session.PrevReadPosInRecvBuffer], session.ReServerHostingDataSize);
@@ -405,9 +403,9 @@ namespace NetworkLib
 			auto error = WSAGetLastError();
 			if (error != WSAEWOULDBLOCK)
 			{
-				return NET_ERROR_CODE::RECV_API_ERROR; 
+				return NET_ERROR_CODE::RECV_API_ERROR;
 			}
-			else 
+			else
 			{
 				return NET_ERROR_CODE::NONE;
 			}
@@ -420,11 +418,11 @@ namespace NetworkLib
 	NET_ERROR_CODE TcpNetwork::recvBufferProcess(const int sessionIndex)
 	{
 		auto& session = _clientSessionPool[sessionIndex];
-		
+
 		auto readPos = 0;
 		const auto dataSize = session.ReServerHostingDataSize;
 		PacketHeader* pPktHeader;
-		
+
 		while ((dataSize - readPos) >= PACKET_HEADER_SIZE)
 		{
 			pPktHeader = (PacketHeader*)&session.pRecvBuffer[readPos];
@@ -448,10 +446,10 @@ namespace NetworkLib
 			addPacketQueue(sessionIndex, pPktHeader->Id, pPktHeader->BodySize, &session.pRecvBuffer[readPos]);
 			readPos += pPktHeader->BodySize;
 		}
-		
+
 		session.ReServerHostingDataSize -= readPos;
 		session.PrevReadPosInRecvBuffer = readPos;
-		
+
 		return NET_ERROR_CODE::NONE;
 	}
 
@@ -533,6 +531,4 @@ namespace NetworkLib
 
 		return result;
 	}
-
-	
 }
